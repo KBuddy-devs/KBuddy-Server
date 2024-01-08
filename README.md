@@ -19,7 +19,7 @@ $ bash ./scripts/setup.sh
 ```
 
 ## Code Convention
-- 개발 횐경 세팅 시 Python 3.11.1 버전이 필수로 설치되어 있어야 합니다.
+- 개발 환경 세팅 시 Python 3.11.1 버전이 필수로 설치되어 있어야 합니다.
 - 모든 소스 코드의 스타일은 [PEP 8](https://peps.python.org/pep-0008/)을 준수해야 합니다.
 - 모든 소스 코드는 Black Formatter를 통해 포맷팅 되어야 합니다.
 > Formatting 적용 방법
