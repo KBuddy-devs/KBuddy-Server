@@ -3,6 +3,7 @@ package com.example.kbuddy_backend.user.service;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.User;
+import com.example.kbuddy_backend.user.exception.DuplicateUserException;
 import com.example.kbuddy_backend.user.exception.InvalidPasswordException;
 import com.example.kbuddy_backend.user.exception.UserNotFoundException;
 import com.example.kbuddy_backend.user.repository.UserAuthRepository;
@@ -28,7 +29,7 @@ public class UserAuthService {
         final Optional<User> user = userAuthRepository.findByUsername(username);
 
         if (user.isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
+            throw new DuplicateUserException();
         }
 
         String password = passwordEncoder.encode(loginRequest.password());
@@ -43,21 +44,21 @@ public class UserAuthService {
 
     public UserResponse login(final LoginRequest loginRequest) {
 
-            String username = loginRequest.username();
-            String password = loginRequest.password();
+        String username = loginRequest.username();
+        String password = loginRequest.password();
 
-            final Optional<User> user = userAuthRepository.findByUsername(username);
+        final Optional<User> user = userAuthRepository.findByUsername(username);
 
-            if (user.isEmpty()) {
-                throw new UserNotFoundException();
-            }
+        if (user.isEmpty()) {
+            throw new UserNotFoundException();
+        }
 
-            User findUser = user.get();
+        User findUser = user.get();
 
-            if (!passwordEncoder.matches(password, findUser.getPassword())) {
-                throw new InvalidPasswordException();
-            }
+        if (!passwordEncoder.matches(password, findUser.getPassword())) {
+            throw new InvalidPasswordException();
+        }
 
-            return UserResponse.of(findUser.getId(), findUser.getUsername());
+        return UserResponse.of(findUser.getId(), findUser.getUsername());
     }
 }
