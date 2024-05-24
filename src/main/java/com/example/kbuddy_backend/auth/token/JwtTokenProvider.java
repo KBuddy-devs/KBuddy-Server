@@ -20,17 +20,20 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider implements TokenProvider {
 
     private final SecretKey key;
-    private final long validityInMilliseconds;
+    private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
 
     public JwtTokenProvider(@Value("${security.jwt.secret-key}") final String secretKey,
-                            @Value("${security.jwt.access-token-expiration}") final long validityInMilliseconds) {
+                            @Value("${security.jwt.access-token-expiration}") final long accessTokenValidityInMilliseconds,
+                            @Value("${security.jwt.refresh-token-expiration}") final long refreshTokenValidityInMilliseconds) {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-        this.validityInMilliseconds = validityInMilliseconds;
+        this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
+        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
 
     }
 
     @Override
-    public TokenResponse createToken(final String email, final String role) {
+    public TokenResponse createToken(final String email, final String role, final long tokenValidityInMilliseconds) {
 
         Claims claims = Jwts.claims();
         //상담원 사용자인지 일반 사용자인지 구분하기 위한 role 추가
@@ -40,12 +43,21 @@ public class JwtTokenProvider implements TokenProvider {
                 .setSubject(email)
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + validityInMilliseconds))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidityInMilliseconds))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         return TokenResponse.from(token);
     }
+
+    public TokenResponse createAccessToken(final String email, final String role) {
+        return createToken(email, role, accessTokenValidityInMilliseconds);
+    }
+
+    public TokenResponse createRefreshToken(final String email, final String role) {
+        return createToken(email, role, refreshTokenValidityInMilliseconds);
+    }
+
 
     @Override
     public String getPayload(final String token) {
@@ -80,8 +92,13 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     @Override
-    public long getExpiryDuration() {
-        return validityInMilliseconds;
+    public long getAccessTokenExpiryDuration() {
+        return accessTokenValidityInMilliseconds;
+    }
+
+    @Override
+    public long getRefreshTokenExpiryDuration() {
+        return refreshTokenValidityInMilliseconds;
     }
 
     //사용자 role 반환
