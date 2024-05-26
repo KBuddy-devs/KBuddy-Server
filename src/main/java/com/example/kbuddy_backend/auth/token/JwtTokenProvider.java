@@ -2,6 +2,7 @@ package com.example.kbuddy_backend.auth.token;
 
 import com.example.kbuddy_backend.auth.dto.response.TokenResponse;
 import com.example.kbuddy_backend.auth.exception.TokenExpirationException;
+import com.example.kbuddy_backend.user.constant.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -9,10 +10,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,33 +39,57 @@ public class JwtTokenProvider implements TokenProvider {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
         this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
-
     }
 
     @Override
-    public TokenResponse createToken(final String email, final String role, final long tokenValidityInMilliseconds) {
+    public TokenResponse createToken(Authentication authentication, final long tokenValidityInMilliseconds) {
 
-        Claims claims = Jwts.claims();
+        final ZonedDateTime now = ZonedDateTime.now();
+        final ZonedDateTime tokenValidity = now.plusSeconds(tokenValidityInMilliseconds);
+
+        String authorities = authentication.getAuthorities()
+                .stream().map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+
         //상담원 사용자인지 일반 사용자인지 구분하기 위한 role 추가
-        claims.put("role", role);
+
 
         String token = Jwts.builder()
-                .setSubject(email)
-                .setClaims(claims)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + tokenValidityInMilliseconds))
+                .setSubject(authentication.getName())
+                .claim("role",authorities)
+                .setIssuedAt(Date.from(now.toInstant()))
+                .setExpiration(Date.from(tokenValidity.toInstant()))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         return TokenResponse.from(token);
     }
 
-    public TokenResponse createAccessToken(final String email, final String role) {
-        return createToken(email, role, accessTokenValidityInMilliseconds);
+    public TokenResponse createAccessToken(Authentication authentication) {
+        return createToken(authentication, accessTokenValidityInMilliseconds);
     }
 
-    public TokenResponse createRefreshToken(final String email, final String role) {
-        return createToken(email, role, refreshTokenValidityInMilliseconds);
+    public TokenResponse createRefreshToken(Authentication authentication) {
+        return createToken(authentication, refreshTokenValidityInMilliseconds);
+    }
+
+    public Authentication getAuthentication(final String token) {
+
+        Claims claims = Jwts
+                .parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get("role").toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+        User principal = new User(claims.getSubject(), "", authorities);
+
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
 

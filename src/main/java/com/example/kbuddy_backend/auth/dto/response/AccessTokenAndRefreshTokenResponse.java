@@ -1,4 +1,4 @@
-package com.example.kbuddy_backend.auth.dto;
+package com.example.kbuddy_backend.auth.dto.response;
 
 public record AccessTokenAndRefreshTokenResponse(String accessToken, String refreshToken, long accessTokenExpireTime,
                                                  long refreshTokenExpireTime) {

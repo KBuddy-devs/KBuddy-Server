@@ -1,5 +1,6 @@
 package com.example.kbuddy_backend.user.controller;
 
+import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.service.UserAuthService;
@@ -18,10 +19,9 @@ public class UserAuthController {
     private final UserAuthService userAuthService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody final LoginRequest loginRequest) {
-        UserResponse userResponse = userAuthService.register(loginRequest);
-
-        return ResponseEntity.ok().body(userResponse);
+    public ResponseEntity<AccessTokenAndRefreshTokenResponse> register(@RequestBody final LoginRequest loginRequest) {
+        AccessTokenAndRefreshTokenResponse token = userAuthService.register(loginRequest);
+        return ResponseEntity.ok().body(token);
     }
 
     @PostMapping("/login")
