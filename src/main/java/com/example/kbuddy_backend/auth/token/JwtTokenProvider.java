@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,7 +55,6 @@ public class JwtTokenProvider implements TokenProvider {
 
         //상담원 사용자인지 일반 사용자인지 구분하기 위한 role 추가
 
-
         String token = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("role",authorities)
@@ -82,6 +82,7 @@ public class JwtTokenProvider implements TokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get("role").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
@@ -144,4 +145,5 @@ public class JwtTokenProvider implements TokenProvider {
                 .getBody()
                 .get("role", String.class);
     }
+
 }

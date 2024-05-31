@@ -1,15 +1,17 @@
 package com.example.kbuddy_backend.user.service;
 
-import static com.example.kbuddy_backend.user.constant.UserRole.BUISNESS_USER;
+import static com.example.kbuddy_backend.user.constant.UserRole.NORMAL_USER;
 
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.AuthService;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
+import com.example.kbuddy_backend.user.entity.Authority;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.exception.DuplicateUserException;
 import com.example.kbuddy_backend.user.exception.InvalidPasswordException;
 import com.example.kbuddy_backend.user.exception.UserNotFoundException;
+import com.example.kbuddy_backend.user.repository.AuthorityRepository;
 import com.example.kbuddy_backend.user.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +19,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,10 +33,13 @@ public class UserAuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final AuthorityRepository authorityRepository;
 
     @Transactional
     public AccessTokenAndRefreshTokenResponse register(final LoginRequest loginRequest) {
 
+        //todo: final default 설정하기
         final String email = loginRequest.email();
 
         final Optional<User> user = userRepository.findByUsername(email);
@@ -49,24 +53,25 @@ public class UserAuthService {
         final User newUser = User.builder()
                 .username(email)
                 .password(password).build();
+        newUser.addAuthority(new Authority(NORMAL_USER));
         User saveUser = userRepository.save(newUser);
 
         List<GrantedAuthority> grantedAuthorities = saveUser.getAuthorities().stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName()))
+                .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName().name()))
                 .collect(Collectors.toList());
 
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(email, password,grantedAuthorities);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(email, password, grantedAuthorities);
 
-        return authService.createToken(authentication);
+        return authService.createToken(authenticationToken);
     }
 
     public UserResponse login(final LoginRequest loginRequest) {
 
-        final String username = loginRequest.username();
+        final String email = loginRequest.email();
         final String password = loginRequest.password();
 
-        final Optional<User> user = userRepository.findByUsername(username);
+        final Optional<User> user = userRepository.findByUsername(email);
 
         if (user.isEmpty()) {
             throw new UserNotFoundException();
@@ -77,7 +82,6 @@ public class UserAuthService {
         if (!passwordEncoder.matches(password, findUser.getPassword())) {
             throw new InvalidPasswordException();
         }
-
         return UserResponse.of(findUser.getId(), findUser.getUsername());
     }
 }

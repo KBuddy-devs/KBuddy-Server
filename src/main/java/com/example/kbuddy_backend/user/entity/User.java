@@ -9,17 +9,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.lang.Nullable;
 
 @Getter
@@ -36,19 +33,20 @@ public class User {
     private String email;
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
-
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-    private Set<Authority> authorities;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Authority> authorities = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Nullable
     private OAuthCategory oAuthCategory;
 
-
+    public void addAuthority(Authority authority) {
+        authorities.add(authority);
+        authority.setUser(this);
+    }
     @Builder
-    public User(String username, String password, String email) {
+    public User(String username, String password, String email,
+                OAuthCategory oAuthCategory) {
         this.email = email;
         this.username = username;
         this.password = password;
