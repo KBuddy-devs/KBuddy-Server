@@ -3,6 +3,7 @@ package com.example.kbuddy_backend.user.entity;
 import com.example.kbuddy_backend.user.constant.OAuthCategory;
 import com.example.kbuddy_backend.user.constant.UserRole;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,13 +28,14 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     private String username;
     private String email;
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Authority> authorities = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
