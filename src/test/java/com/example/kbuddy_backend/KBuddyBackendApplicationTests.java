@@ -9,5 +9,4 @@ class KBuddyBackendApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
