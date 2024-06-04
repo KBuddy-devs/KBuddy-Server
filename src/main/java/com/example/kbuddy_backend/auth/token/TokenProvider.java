@@ -10,6 +10,8 @@ public interface TokenProvider {
 
     String getPayload(final String token);
 
+    Authentication getAuthentication(final String token);
+
     boolean validateToken(final String token);
 
     long getAccessTokenExpiryDuration();
