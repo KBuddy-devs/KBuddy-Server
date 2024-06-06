@@ -42,6 +42,7 @@ public class UserAuthController {
         return ResponseEntity.ok().body(userRepository.findAll());
     }
 
+    //테스트 api
     @GetMapping("/authentication")
     public ResponseEntity<Authentication> getUserAuthentication(Authentication authentication) {
 
