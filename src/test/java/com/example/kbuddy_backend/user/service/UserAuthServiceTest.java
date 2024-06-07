@@ -33,7 +33,7 @@ class UserAuthServiceTest extends IntegrationTest {
     @Mock
     private LoginRequest mockLoginRequest;
 
-    @DisplayName("로그인 성공시 토큰을 반환한다.")
+    @DisplayName("회원가입 성공시 토큰을 반환한다.")
     @Test
     void loginSuccess() {
         //given

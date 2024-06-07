@@ -81,6 +81,8 @@ public class UserAuthService {
         if (!passwordEncoder.matches(password, findUser.getPassword())) {
             throw new InvalidPasswordException();
         }
+        
+        //todo: 토큰 반환으로 수정
         return UserResponse.of(findUser.getId(), findUser.getUsername());
     }
 }
