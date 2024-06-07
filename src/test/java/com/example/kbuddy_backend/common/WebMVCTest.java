@@ -4,6 +4,7 @@ import com.example.kbuddy_backend.auth.token.JwtTokenProvider;
 import com.example.kbuddy_backend.auth.token.TokenProvider;
 import com.example.kbuddy_backend.common.config.SecurityConfig;
 import com.example.kbuddy_backend.user.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,6 +28,9 @@ public abstract class WebMVCTest {
 
     @Autowired
     protected TokenProvider tokenProvider;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @MockBean
     protected UserRepository userRepository;

@@ -1,6 +1,7 @@
 package com.example.kbuddy_backend.auth.config;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,9 +30,8 @@ class JwtFilterTest extends WebMVCTest {
         final UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken("email", "password", grantedAuthorities);
 
-        //when
-        when(tokenProvider.validateToken(anyString())).thenReturn(true);
-        when(tokenProvider.getAuthentication(anyString())).thenReturn(authentication);
+        given(tokenProvider.validateToken(anyString())).willReturn(true);
+        given(tokenProvider.getAuthentication(anyString())).willReturn(authentication);
 
         //then
         mockMvc.perform(get("/api/v1/user/auth/authentication")
@@ -43,9 +43,9 @@ class JwtFilterTest extends WebMVCTest {
     @Test
     void checkInValidToken() throws Exception {
         //given
+        given(tokenProvider.validateToken(anyString())).willReturn(false);
 
         //when
-        when(tokenProvider.validateToken(anyString())).thenReturn(false);
 
         //then
         mockMvc.perform(get("/api/v1/user/auth/authentication")

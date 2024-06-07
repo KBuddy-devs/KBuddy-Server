@@ -33,16 +33,15 @@ public class UserAuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final AuthorityRepository authorityRepository;
 
     @Transactional
     public AccessTokenAndRefreshTokenResponse register(final LoginRequest loginRequest) {
 
         //todo: final default 설정하기
+        //todo: 유효성 검사 및 테스트 코드
         final String email = loginRequest.email();
 
-        final Optional<User> user = userRepository.findByUsername(email);
+        Optional<User> user = userRepository.findByUsername(email);
 
         if (user.isPresent()) {
             throw new DuplicateUserException();
