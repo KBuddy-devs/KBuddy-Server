@@ -74,6 +74,7 @@ public class JwtTokenProvider implements TokenProvider {
         return createToken(authentication, refreshTokenValidityInMilliseconds);
     }
 
+    @Override
     public Authentication getAuthentication(final String token) {
 
         Claims claims = Jwts

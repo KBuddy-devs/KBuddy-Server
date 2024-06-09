@@ -16,6 +16,5 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         
         //유효한 자격증명이 없을 시 401에러 반환
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-
     }
 }
