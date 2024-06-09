@@ -7,7 +7,6 @@ import com.example.kbuddy_backend.auth.token.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -32,7 +31,7 @@ public class SecurityConfig {
     //시큐리티를 적용하지 않을 리소스
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/error", "favicon.io");
+        return (web) -> web.ignoring().requestMatchers("/error", "favicon.ico","/h2-console/**");
     }
 
     @Bean
@@ -54,7 +53,7 @@ public class SecurityConfig {
                 })
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/v1/auth/register","/api/v1/auth/login").permitAll()
+                                .requestMatchers("/api/v1/user/auth/**").permitAll()
                                 .anyRequest().authenticated());
 
         return http.build();

@@ -1,8 +1,8 @@
 package com.example.kbuddy_backend.auth.token;
 
+import com.example.kbuddy_backend.auth.config.CustomUserDetails;
 import com.example.kbuddy_backend.auth.dto.response.TokenResponse;
 import com.example.kbuddy_backend.auth.exception.TokenExpirationException;
-import com.example.kbuddy_backend.user.constant.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -11,10 +11,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -88,8 +88,8 @@ public class JwtTokenProvider implements TokenProvider {
                 Arrays.stream(claims.get("role").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-
-        User principal = new User(claims.getSubject(), "", authorities);
+        List<String> roles = new ArrayList<>(Arrays.asList(claims.get("role").toString().split(",")));
+        CustomUserDetails principal = new CustomUserDetails(claims.getSubject(), roles);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

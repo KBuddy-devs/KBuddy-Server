@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -38,5 +39,12 @@ public class Qna extends BaseTimeEntity {
 
     private Long viewCount;
 
+    @Builder
+    public Qna(User writer, String title, String description) {
+        this.writer = writer;
+        this.title = title;
+        this.description = description;
+
+    }
 
 }
