@@ -1,15 +1,18 @@
 package com.example.kbuddy_backend.user.entity;
 
+import com.example.kbuddy_backend.qna.entity.QnaHeart;
 import com.example.kbuddy_backend.user.constant.OAuthCategory;
-import com.example.kbuddy_backend.user.constant.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -42,6 +45,9 @@ public class User {
     @Nullable
     private OAuthCategory oAuthCategory;
 
+    @OneToMany(mappedBy = "user")
+    private List<QnaHeart> qnaHeart = new ArrayList<>();
+
     public void addAuthority(Authority authority) {
         authorities.add(authority);
         authority.setUser(this);
@@ -52,5 +58,6 @@ public class User {
         this.email = email;
         this.username = username;
         this.password = password;
+        this.oAuthCategory = oAuthCategory;
     }
 }

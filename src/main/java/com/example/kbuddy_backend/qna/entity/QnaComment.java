@@ -15,45 +15,51 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Qna extends BaseTimeEntity {
+public class QnaComment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "qna_id")
+    @Column(name = "qna_comment_id")
     private Long id;
 
+    private String content;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "writer_id")
     private User writer;
 
-    @OneToMany(mappedBy = "qna")
-    private List<QnaHeart> qnaHearts = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "qna_id")
+    private Qna qna;
 
-    @OneToMany(mappedBy = "qna")
-    private List<QnaComment> comments = new ArrayList<>();
+    //대댓글
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private QnaComment parent;
 
-    @OneToMany(mappedBy = "qna")
-    private List<QnaCategory> category = new ArrayList<>();
+    @OneToMany(mappedBy = "parent")
+    private List<QnaComment> children = new ArrayList<>();
 
-    private String title;
-    private String description;
-
-    private Long viewCount;
-
-    @Builder
-    public Qna(User writer, String title, String description) {
-        this.writer = writer;
-        this.title = title;
-        this.description = description;
-
+    public void setQna(Qna qna) {
+        this.qna = qna;
     }
 
-    public void addComment(QnaComment qnaComment) {
-        comments.add(qnaComment);
+    @Builder
+    public QnaComment(User writer, Qna qna, String content) {
+        this.content = content;
+        this.writer = writer;
+        this.qna = qna;
+    }
+
+    public void addQna(Qna qna) {
+        this.qna = qna;
+        qna.addComment(this);
     }
 
 }
