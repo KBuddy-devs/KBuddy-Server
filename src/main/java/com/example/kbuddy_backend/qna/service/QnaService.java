@@ -1,13 +1,15 @@
 package com.example.kbuddy_backend.qna.service;
 
-import com.example.kbuddy_backend.qna.dto.request.QnaCommentSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
+import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.entity.Qna;
-import com.example.kbuddy_backend.qna.entity.QnaComment;
+import com.example.kbuddy_backend.qna.entity.QnaHeart;
+import com.example.kbuddy_backend.qna.exception.DuplicateQnaHeartException;
 import com.example.kbuddy_backend.qna.exception.QnaNotFoundException;
-import com.example.kbuddy_backend.qna.repository.QnaCommentRepository;
+import com.example.kbuddy_backend.qna.repository.QnaHeartRepository;
 import com.example.kbuddy_backend.qna.repository.QnaRepository;
 import com.example.kbuddy_backend.user.entity.User;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class QnaService {
 
     private final QnaRepository qnaRepository;
-    private final QnaCommentRepository qnaCommentRepository;
-
+    private final QnaHeartRepository qnaHeartRepository;
 
     @Transactional
     public void saveQna(QnaSaveRequest qnaSaveRequest, User user) {
@@ -33,14 +34,43 @@ public class QnaService {
         qnaRepository.save(qna);
     }
 
+
     @Transactional
-    public void saveQnaComment(QnaCommentSaveRequest qnaCommentSaveRequest, User user) {
-        final Qna qna = qnaRepository.findById(qnaCommentSaveRequest.qnaId()).orElseThrow(QnaNotFoundException::new);
-        QnaComment qnaComment = QnaComment.builder()
-                .content(qnaCommentSaveRequest.content())
-                .qna(qna)
-                .writer(user)
-                .build();
-        qnaCommentRepository.save(qnaComment);
+    public void plusHeart(Long qnaId, User user) {
+        qnaHeartRepository.findByQnaIdAndUserId(qnaId, user.getId())
+                .ifPresent(qnaHeart -> {
+                    throw new DuplicateQnaHeartException();
+                });
+        Qna qna = findQnaById(qnaId);
+        QnaHeart qnaHeart = new QnaHeart(user, qna);
+        qna.plusHeart(qnaHeart);
+        qnaHeartRepository.save(qnaHeart);
+    }
+
+    @Transactional
+    public void minusHeart(Long qnaId, User user) {
+
+        Qna qnaById = findQnaById(qnaId);
+        QnaHeart byQnaIdAndUserId = qnaHeartRepository.findByQnaIdAndUserId(qnaId, user.getId()).orElseThrow(QnaNotFoundException::new);
+        qnaById.minusHeart(byQnaIdAndUserId);
+        qnaHeartRepository.deleteByQnaIdAndUserId(qnaId, user.getId());
+    }
+
+
+    public Qna findQnaById(Long qnaId) {
+        return qnaRepository.findById(qnaId).orElseThrow(QnaNotFoundException::new);
+    }
+
+    //todo: commentCount 수정
+    public QnaResponse makeQnaResponseDto(Qna qna) {
+        return QnaResponse.of(qna.getId(), qna.getTitle(), qna.getDescription(), qna.getWriter().getUsername(),
+                qna.getHeartCount(), qna.getCommentCount(), qna.getViewCount());
+    }
+
+    @Transactional
+    public QnaResponse getQna(Long qnaId) {
+        Qna qnaById = findQnaById(qnaId);
+        qnaById.plustViewCount();
+        return makeQnaResponseDto(qnaById);
     }
 }

@@ -33,4 +33,12 @@ public class QnaHeart extends BaseTimeEntity {
     @JoinColumn(name = "qna_id")
     private Qna qna;
 
+    public QnaHeart(User user, Qna qna) {
+        this.user = user;
+        this.qna = qna;
+    }
+
+    public void setQna(Qna qna) {
+        this.qna = qna;
+    }
 }

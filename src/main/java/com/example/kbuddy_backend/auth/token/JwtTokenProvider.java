@@ -31,22 +31,22 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider implements TokenProvider {
 
     private final SecretKey key;
-    private final long accessTokenValidityInMilliseconds;
-    private final long refreshTokenValidityInMilliseconds;
+    private final long accessTokenValidityInSeconds;
+    private final long refreshTokenValidityInSeconds;
 
     public JwtTokenProvider(@Value("${security.jwt.secret-key}") final String secretKey,
-                            @Value("${security.jwt.access-token-expiration}") final long accessTokenValidityInMilliseconds,
-                            @Value("${security.jwt.refresh-token-expiration}") final long refreshTokenValidityInMilliseconds) {
+                            @Value("${security.jwt.access-token-expiration}") final long accessTokenValidityInSeconds,
+                            @Value("${security.jwt.refresh-token-expiration}") final long refreshTokenValidityInSeconds) {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-        this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
-        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
+        this.accessTokenValidityInSeconds = accessTokenValidityInSeconds;
+        this.refreshTokenValidityInSeconds = refreshTokenValidityInSeconds;
     }
 
     @Override
-    public TokenResponse createToken(Authentication authentication, final long tokenValidityInMilliseconds) {
+    public TokenResponse createToken(Authentication authentication, final long tokenValidityInSeconds) {
 
         final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime tokenValidity = now.plusSeconds(tokenValidityInMilliseconds);
+        final ZonedDateTime tokenValidity = now.plusSeconds(tokenValidityInSeconds);
 
         String authorities = authentication.getAuthorities()
                 .stream().map(GrantedAuthority::getAuthority)
@@ -67,11 +67,11 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     public TokenResponse createAccessToken(Authentication authentication) {
-        return createToken(authentication, accessTokenValidityInMilliseconds);
+        return createToken(authentication, accessTokenValidityInSeconds);
     }
 
     public TokenResponse createRefreshToken(Authentication authentication) {
-        return createToken(authentication, refreshTokenValidityInMilliseconds);
+        return createToken(authentication, refreshTokenValidityInSeconds);
     }
 
     @Override
@@ -129,12 +129,12 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public long getAccessTokenExpiryDuration() {
-        return accessTokenValidityInMilliseconds;
+        return accessTokenValidityInSeconds;
     }
 
     @Override
     public long getRefreshTokenExpiryDuration() {
-        return refreshTokenValidityInMilliseconds;
+        return refreshTokenValidityInSeconds;
     }
 
     //사용자 role 반환

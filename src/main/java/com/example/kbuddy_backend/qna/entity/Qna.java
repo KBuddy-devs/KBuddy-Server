@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Qna extends BaseTimeEntity {
 
@@ -42,7 +44,9 @@ public class Qna extends BaseTimeEntity {
     private String title;
     private String description;
 
-    private Long viewCount;
+    private int heartCount;
+
+    private int viewCount;
 
     @Builder
     public Qna(User writer, String title, String description) {
@@ -55,5 +59,27 @@ public class Qna extends BaseTimeEntity {
     public void addComment(QnaComment qnaComment) {
         comments.add(qnaComment);
     }
+
+    public void plusHeart(QnaHeart qnaHeart) {
+        this.heartCount += 1;
+        this.qnaHearts.add(qnaHeart);
+        qnaHeart.setQna(this);
+    }
+
+    public void minusHeart(QnaHeart qnaHeart) {
+        if (this.heartCount > 0){
+            this.heartCount -= 1;
+        }
+        this.qnaHearts.remove(qnaHeart);
+    }
+
+    public void plustViewCount() {
+        this.viewCount += 1;
+    }
+
+    public int getCommentCount() {
+        return comments.size();
+    }
+
 
 }
