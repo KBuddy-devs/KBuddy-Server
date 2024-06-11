@@ -63,7 +63,6 @@ public class Qna extends BaseTimeEntity {
     public void plusHeart(QnaHeart qnaHeart) {
         this.heartCount += 1;
         this.qnaHearts.add(qnaHeart);
-        qnaHeart.setQna(this);
     }
 
     public void minusHeart(QnaHeart qnaHeart) {
