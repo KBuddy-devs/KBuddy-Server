@@ -72,7 +72,7 @@ public class Qna extends BaseTimeEntity {
         this.qnaHearts.remove(qnaHeart);
     }
 
-    public void plustViewCount() {
+    public void plusViewCount() {
         this.viewCount += 1;
     }
 

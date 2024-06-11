@@ -25,7 +25,7 @@ public class QnaComment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "qna_comment_id")
+    @Column(name = "comment_id")
     private Long id;
 
     private String content;
@@ -38,6 +38,9 @@ public class QnaComment extends BaseTimeEntity {
     @JoinColumn(name = "qna_id")
     private Qna qna;
 
+    @OneToMany(mappedBy = "qnaComment")
+    private List<QnaHeart> qnaHearts = new ArrayList<>();
+
     //대댓글
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -45,6 +48,8 @@ public class QnaComment extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "parent")
     private List<QnaComment> children = new ArrayList<>();
+
+    private int heartCount;
 
     public void setQna(Qna qna) {
         this.qna = qna;
@@ -57,9 +62,22 @@ public class QnaComment extends BaseTimeEntity {
         this.qna = qna;
     }
 
+    public void plusHeart(QnaHeart qnaHeart) {
+        this.heartCount += 1;
+        this.qnaHearts.add(qnaHeart);
+    }
+
+    public void minusHeart(QnaHeart qnaHeart) {
+        if (this.heartCount > 0) {
+            this.heartCount -= 1;
+        }
+        this.qnaHearts.remove(qnaHeart);
+    }
+
     public void addQna(Qna qna) {
         this.qna = qna;
         qna.addComment(this);
     }
+
 
 }

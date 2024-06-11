@@ -41,10 +41,10 @@ public class QnaController {
         return ResponseEntity.ok().body(qna);
     }
 
-    @PostMapping("/comment")
-    public ResponseEntity<?> saveQnaComment(@RequestBody QnaCommentSaveRequest qnaCommentSaveRequest,
+    @PostMapping("/{qnaId}/comment")
+    public ResponseEntity<?> saveQnaComment(@PathVariable Long qnaId,@RequestBody QnaCommentSaveRequest qnaCommentSaveRequest,
                                             @CurrentUser User user) {
-        qnaCommentService.saveQnaComment(qnaCommentSaveRequest, user);
+        qnaCommentService.saveQnaComment(qnaId,qnaCommentSaveRequest, user);
         return ResponseEntity.ok().body("success");
     }
 
@@ -59,6 +59,20 @@ public class QnaController {
     @DeleteMapping("/{qnaId}/hearts")
     public ResponseEntity<?> minusQnaHeart(@PathVariable Long qnaId, @CurrentUser User user) {
         qnaService.minusHeart(qnaId, user);
+        return ResponseEntity.ok().body("success");
+    }
+
+    //댓글 좋아요
+    @PostMapping("/comment/{commentId}/hearts")
+    public ResponseEntity<?> plusCommentHeart(@PathVariable Long commentId, @CurrentUser User user) {
+        qnaCommentService.plusHeart(commentId, user);
+        return ResponseEntity.ok().body("success");
+    }
+
+    //댓글 좋아요 취소
+    @DeleteMapping("/comment/{commentId}/hearts")
+    public ResponseEntity<?> minusCommentHeart(@PathVariable Long commentId, @CurrentUser User user) {
+        qnaCommentService.minusHeart(commentId, user);
         return ResponseEntity.ok().body("success");
     }
 }

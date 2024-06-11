@@ -4,12 +4,11 @@ import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.entity.Qna;
 import com.example.kbuddy_backend.qna.entity.QnaHeart;
-import com.example.kbuddy_backend.qna.exception.DuplicateQnaHeartException;
+import com.example.kbuddy_backend.qna.exception.DuplicatedQnaHeartException;
 import com.example.kbuddy_backend.qna.exception.QnaNotFoundException;
 import com.example.kbuddy_backend.qna.repository.QnaHeartRepository;
 import com.example.kbuddy_backend.qna.repository.QnaRepository;
 import com.example.kbuddy_backend.user.entity.User;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,7 @@ public class QnaService {
     public void plusHeart(Long qnaId, User user) {
         qnaHeartRepository.findByQnaIdAndUserId(qnaId, user.getId())
                 .ifPresent(qnaHeart -> {
-                    throw new DuplicateQnaHeartException();
+                    throw new DuplicatedQnaHeartException();
                 });
         Qna qna = findQnaById(qnaId);
         QnaHeart qnaHeart = new QnaHeart(user, qna);
@@ -70,7 +69,7 @@ public class QnaService {
     @Transactional
     public QnaResponse getQna(Long qnaId) {
         Qna qnaById = findQnaById(qnaId);
-        qnaById.plustViewCount();
+        qnaById.plusViewCount();
         return makeQnaResponseDto(qnaById);
     }
 }
