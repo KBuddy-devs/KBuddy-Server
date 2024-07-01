@@ -37,6 +37,10 @@ public class UserAuthController {
         return ResponseEntity.ok().body(userResponse);
     }
 
+    // TODO : Resolve Error =>
+    //  WARN 82890 --- [nio-8080-exec-1] .w.s.m.s.DefaultHandlerExceptionResolver :
+    //  Resolved [org.springframework.http.converter.HttpMessageNotWritableException: Could not write JSON:
+    //  Infinite recursion (StackOverflowError)]
     @GetMapping
     public ResponseEntity<List<User>> getUser() {
         return ResponseEntity.ok().body(userRepository.findAll());
