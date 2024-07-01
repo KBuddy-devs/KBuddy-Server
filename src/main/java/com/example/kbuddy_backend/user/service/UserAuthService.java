@@ -11,14 +11,12 @@ import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.exception.DuplicateUserException;
 import com.example.kbuddy_backend.user.exception.InvalidPasswordException;
 import com.example.kbuddy_backend.user.exception.UserNotFoundException;
-import com.example.kbuddy_backend.user.repository.AuthorityRepository;
 import com.example.kbuddy_backend.user.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,8 +38,9 @@ public class UserAuthService {
         //todo: final default 설정하기
         //todo: 유효성 검사 및 테스트 코드
         final String email = loginRequest.email();
+        final String username = loginRequest.username();
 
-        Optional<User> user = userRepository.findByUsername(email);
+        Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isPresent()) {
             throw new DuplicateUserException();
@@ -50,8 +49,10 @@ public class UserAuthService {
         final String password = passwordEncoder.encode(loginRequest.password());
 
         final User newUser = User.builder()
-                .username(email)
+                .username(username)
+                .email(email)
                 .password(password).build();
+
         newUser.addAuthority(new Authority(NORMAL_USER));
         User saveUser = userRepository.save(newUser);
 
@@ -70,7 +71,7 @@ public class UserAuthService {
         final String email = loginRequest.email();
         final String password = loginRequest.password();
 
-        final Optional<User> user = userRepository.findByUsername(email);
+        final Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
             throw new UserNotFoundException();

@@ -1,8 +1,8 @@
 package com.example.kbuddy_backend.auth.token;
 
+import com.example.kbuddy_backend.auth.config.CustomUserDetails;
 import com.example.kbuddy_backend.auth.dto.response.TokenResponse;
 import com.example.kbuddy_backend.auth.exception.TokenExpirationException;
-import com.example.kbuddy_backend.user.constant.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -11,10 +11,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,22 +31,22 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider implements TokenProvider {
 
     private final SecretKey key;
-    private final long accessTokenValidityInMilliseconds;
-    private final long refreshTokenValidityInMilliseconds;
+    private final long accessTokenValidityInSeconds;
+    private final long refreshTokenValidityInSeconds;
 
     public JwtTokenProvider(@Value("${security.jwt.secret-key}") final String secretKey,
-                            @Value("${security.jwt.access-token-expiration}") final long accessTokenValidityInMilliseconds,
-                            @Value("${security.jwt.refresh-token-expiration}") final long refreshTokenValidityInMilliseconds) {
+                            @Value("${security.jwt.access-token-expiration}") final long accessTokenValidityInSeconds,
+                            @Value("${security.jwt.refresh-token-expiration}") final long refreshTokenValidityInSeconds) {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-        this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
-        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
+        this.accessTokenValidityInSeconds = accessTokenValidityInSeconds;
+        this.refreshTokenValidityInSeconds = refreshTokenValidityInSeconds;
     }
 
     @Override
-    public TokenResponse createToken(Authentication authentication, final long tokenValidityInMilliseconds) {
+    public TokenResponse createToken(Authentication authentication, final long tokenValidityInSeconds) {
 
         final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime tokenValidity = now.plusSeconds(tokenValidityInMilliseconds);
+        final ZonedDateTime tokenValidity = now.plusSeconds(tokenValidityInSeconds);
 
         String authorities = authentication.getAuthorities()
                 .stream().map(GrantedAuthority::getAuthority)
@@ -67,11 +67,11 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     public TokenResponse createAccessToken(Authentication authentication) {
-        return createToken(authentication, accessTokenValidityInMilliseconds);
+        return createToken(authentication, accessTokenValidityInSeconds);
     }
 
     public TokenResponse createRefreshToken(Authentication authentication) {
-        return createToken(authentication, refreshTokenValidityInMilliseconds);
+        return createToken(authentication, refreshTokenValidityInSeconds);
     }
 
     @Override
@@ -88,8 +88,8 @@ public class JwtTokenProvider implements TokenProvider {
                 Arrays.stream(claims.get("role").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-
-        User principal = new User(claims.getSubject(), "", authorities);
+        List<String> roles = new ArrayList<>(Arrays.asList(claims.get("role").toString().split(",")));
+        CustomUserDetails principal = new CustomUserDetails(claims.getSubject(), roles);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
@@ -129,12 +129,12 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public long getAccessTokenExpiryDuration() {
-        return accessTokenValidityInMilliseconds;
+        return accessTokenValidityInSeconds;
     }
 
     @Override
     public long getRefreshTokenExpiryDuration() {
-        return refreshTokenValidityInMilliseconds;
+        return refreshTokenValidityInSeconds;
     }
 
     //사용자 role 반환

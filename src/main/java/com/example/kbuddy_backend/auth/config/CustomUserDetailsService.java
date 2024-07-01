@@ -3,7 +3,6 @@ package com.example.kbuddy_backend.auth.config;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.exception.UserNotFoundException;
 import com.example.kbuddy_backend.user.repository.UserRepository;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
+    //todo: 요 class 삭제해도 될듯
     private final UserRepository userRepository;
 
     @Override
