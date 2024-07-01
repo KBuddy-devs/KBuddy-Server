@@ -17,6 +17,12 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+### Secret ###
+/src/resources/application-dev.properties
+config.properties
+/src/resources/application-oauth.yml
+application-oauth.yml
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
