@@ -27,7 +27,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
-@PropertySource("classpath:config.properties")
 public class JwtTokenProvider implements TokenProvider {
 
     private final SecretKey key;
