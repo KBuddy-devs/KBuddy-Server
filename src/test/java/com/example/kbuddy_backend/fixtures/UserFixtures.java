@@ -1,5 +1,8 @@
 package com.example.kbuddy_backend.fixtures;
 
+import static com.example.kbuddy_backend.user.constant.UserRole.NORMAL_USER;
+
+import com.example.kbuddy_backend.user.entity.Authority;
 import com.example.kbuddy_backend.user.entity.User;
 
 public class UserFixtures {
@@ -8,10 +11,13 @@ public class UserFixtures {
     public static final String PASSWORD = "1q2w3e";
 
     public static User createUser() {
-        return User.builder()
+
+        User user = User.builder()
                 .email(EMAIL)
                 .username(USERNAME)
                 .password(PASSWORD)
                 .build();
+        user.addAuthority(new Authority(NORMAL_USER));
+        return user;
     }
 }

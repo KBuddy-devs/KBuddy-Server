@@ -5,6 +5,7 @@ import static com.example.kbuddy_backend.user.constant.UserRole.NORMAL_USER;
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.AuthService;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
+import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.Authority;
 import com.example.kbuddy_backend.user.entity.User;
@@ -33,12 +34,12 @@ public class UserAuthService {
     private final AuthService authService;
 
     @Transactional
-    public AccessTokenAndRefreshTokenResponse register(final LoginRequest loginRequest) {
+    public AccessTokenAndRefreshTokenResponse register(final RegisterRequest registerRequest) {
 
         //todo: final default 설정하기
         //todo: 유효성 검사 및 테스트 코드
-        final String email = loginRequest.email();
-        final String username = loginRequest.username();
+        final String email = registerRequest.email();
+        final String username = registerRequest.userId();
 
         Optional<User> user = userRepository.findByEmail(email);
 
@@ -46,10 +47,12 @@ public class UserAuthService {
             throw new DuplicateUserException();
         }
 
-        final String password = passwordEncoder.encode(loginRequest.password());
+        final String password = passwordEncoder.encode(registerRequest.password());
 
         final User newUser = User.builder()
                 .username(username)
+                .firstName(registerRequest.firstName())
+                .lastName(registerRequest.lastName())
                 .email(email)
                 .password(password).build();
 
@@ -82,8 +85,10 @@ public class UserAuthService {
         if (!passwordEncoder.matches(password, findUser.getPassword())) {
             throw new InvalidPasswordException();
         }
-        
+
         //todo: 토큰 반환으로 수정
-        return UserResponse.of(findUser.getId(), findUser.getUsername());
+        return UserResponse.of(findUser.getId(), findUser.getUsername(), findUser.getEmail(),
+                findUser.getProfileImageUrl(), findUser.getBio(), findUser.getCreatedDate(), findUser.getFirstName(),
+                findUser.getLastName());
     }
 }

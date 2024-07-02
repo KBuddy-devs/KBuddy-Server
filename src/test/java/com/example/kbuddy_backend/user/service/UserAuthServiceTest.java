@@ -8,8 +8,10 @@ import static org.mockito.BDDMockito.given;
 
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.common.IntegrationTest;
+import com.example.kbuddy_backend.common.config.DataInitializer;
 import com.example.kbuddy_backend.fixtures.UserFixtures;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
+import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.exception.DuplicateUserException;
 import com.example.kbuddy_backend.user.exception.InvalidPasswordException;
@@ -29,19 +31,22 @@ class UserAuthServiceTest extends IntegrationTest {
     private UserAuthService userAuthService;
 
     @MockBean
+    private DataInitializer dataInitializer;
+
+    @MockBean
     private UserRepository userRepository;
     @Mock
-    private LoginRequest mockLoginRequest;
+    private RegisterRequest mockRegisterRequest;
 
     @DisplayName("회원가입 성공시 토큰을 반환한다.")
     @Test
     void loginSuccess() {
         //given
-        LoginRequest loginRequest = LoginRequest.of("test", "test", "test");
+        RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test","test","test");
         given(userRepository.save(any(User.class))).willReturn(UserFixtures.createUser());
 
         //when
-        AccessTokenAndRefreshTokenResponse register = userAuthService.register(loginRequest);
+        AccessTokenAndRefreshTokenResponse register = userAuthService.register(registerRequest);
 
         //then
         assertThat(register).extracting("accessToken").isNotNull();
@@ -53,9 +58,9 @@ class UserAuthServiceTest extends IntegrationTest {
     void checkInvalidPassword() {
         //given
         User user = UserFixtures.createUser();
-        LoginRequest loginRequest = LoginRequest.of("test", "test", "test");
-        given(mockLoginRequest.password()).willReturn("invalidPassword");
-        given(userRepository.findByUsername(anyString())).willReturn(Optional.of(user));
+        LoginRequest loginRequest = LoginRequest.of("test", "test");
+        given(mockRegisterRequest.password()).willReturn("invalidPassword");
+        given(userRepository.findByEmail(anyString())).willReturn(Optional.of(user));
 
         //then
         assertThatThrownBy(() -> userAuthService.login(loginRequest))
@@ -68,8 +73,8 @@ class UserAuthServiceTest extends IntegrationTest {
     @Test
     void checkNotFoundUser() {
         //given
-        LoginRequest loginRequest = LoginRequest.of("test", "test", "test");
-        given(userRepository.findByUsername(anyString())).willReturn(Optional.empty());
+        LoginRequest loginRequest = LoginRequest.of("test","test");
+        given(userRepository.findByEmail(anyString())).willReturn(Optional.empty());
         
         //then
         assertThatThrownBy(() -> userAuthService.login(loginRequest))
@@ -82,11 +87,11 @@ class UserAuthServiceTest extends IntegrationTest {
      void checkDuplicatedEmail() {
          //given
          User user = UserFixtures.createUser();
-         LoginRequest loginRequest = LoginRequest.of("test", user.getEmail(), "test");
-         given(userRepository.findByUsername(anyString())).willReturn(Optional.of(user));
+         RegisterRequest registerRequest = RegisterRequest.of("test", user.getEmail(), "test","test","test");
+         given(userRepository.findByEmail(anyString())).willReturn(Optional.of(user));
 
          //then
-         assertThatThrownBy(() -> userAuthService.register(loginRequest))
+         assertThatThrownBy(() -> userAuthService.register(registerRequest))
                  .isInstanceOf(DuplicateUserException.class)
                  .hasMessageContaining("이미 존재하는 사용자입니다.");
       }

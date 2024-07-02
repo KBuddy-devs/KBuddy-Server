@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -36,6 +37,8 @@ public class DataInitializer {
                 .email("test")
                 .username("test")
                 .password("test")
+                .firstName("test")
+                .lastName("test")
                 .build();
         user.addAuthority(new Authority(NORMAL_USER));
         User saveUser = userRepository.save(user);

@@ -31,7 +31,7 @@ public class SecurityConfig {
     //시큐리티를 적용하지 않을 리소스
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/error", "favicon.ico","/h2-console/**");
+        return (web) -> web.ignoring().requestMatchers("/error", "favicon.ico", "/h2-console/**");
     }
 
     @Bean
@@ -53,6 +53,7 @@ public class SecurityConfig {
                 })
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
+                                .requestMatchers("/api/v1/user/auth/authentication").authenticated()
                                 .requestMatchers("/api/v1/user/auth/**").permitAll()
                                 .anyRequest().authenticated());
 

@@ -1,5 +1,6 @@
 package com.example.kbuddy_backend.user.entity;
 
+import com.example.kbuddy_backend.common.entity.BaseTimeEntity;
 import com.example.kbuddy_backend.qna.entity.QnaHeart;
 import com.example.kbuddy_backend.user.constant.OAuthCategory;
 import jakarta.persistence.CascadeType;
@@ -27,16 +28,20 @@ import org.springframework.lang.Nullable;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
+    private String firstName;
+    private String lastName;
     private String username;
     private String email;
     private String password;
+    private String bio;
+    private String profileImageUrl;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Authority> authorities = new ArrayList<>();
@@ -53,8 +58,10 @@ public class User {
         authority.setUser(this);
     }
     @Builder
-    public User(String username, String password, String email,
+    public User(String username, String password, String email,String firstName,String lastName,
                 OAuthCategory oAuthCategory) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.username = username;
         this.password = password;
