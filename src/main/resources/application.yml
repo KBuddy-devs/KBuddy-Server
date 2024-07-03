@@ -19,3 +19,7 @@ spring:
       hibernate:
         format_sql: true
   sql.init.mode: always
+  data:
+    redis:
+      host: redis
+      port: 6379
