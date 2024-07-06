@@ -11,12 +11,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -71,9 +68,15 @@ public class User extends BaseTimeEntity {
 		authority.setUser(this);
 	}
 
+	public void updateBio(String bio) {
+		this.bio = bio;
+	}
+
 	@Builder
-	public User(String username, String password, String email, String firstName, String lastName,
+	public User(String username, String password, String email, String firstName, String lastName,Gender gender,Country country,
 		OAuthCategory oAuthCategory) {
+		this.gender = gender;
+		this.country = country;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;

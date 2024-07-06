@@ -2,14 +2,12 @@ package com.example.kbuddy_backend.user.controller;
 
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.MailSendService;
-import com.example.kbuddy_backend.common.config.CurrentUser;
 import com.example.kbuddy_backend.user.dto.request.EmailCheckRequest;
 import com.example.kbuddy_backend.user.dto.request.EmailRequest;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.dto.response.DefaultResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
-import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.repository.UserRepository;
 import com.example.kbuddy_backend.user.service.UserAuthService;
 import com.example.kbuddy_backend.user.service.UserService;
@@ -68,20 +66,13 @@ public class UserAuthController {
 
     //이메일 코드 인증
     @PostMapping("/email/code")
-    public ResponseEntity<DefaultResponse> AuthCheck(@RequestBody @Valid EmailCheckRequest emailCheckRequest) {
-        boolean Checked = mailService.CheckAuthNum(emailCheckRequest.email(), emailCheckRequest.code());
-        if (Checked) {
+    public ResponseEntity<DefaultResponse> authCheck(@RequestBody @Valid EmailCheckRequest emailCheckRequest) {
+        boolean checked = mailService.CheckAuthNum(emailCheckRequest.email(), emailCheckRequest.code());
+        if (checked) {
             return ResponseEntity.ok().body(DefaultResponse.of(true,"인증 성공"));
         } else {
             return ResponseEntity.ok().body(DefaultResponse.of(false,"인증 실패"));
         }
-    }
-
-    @GetMapping
-    public ResponseEntity<UserResponse> getUser(@CurrentUser User user) {
-
-        UserResponse findUser = userService.getUser(user);
-        return ResponseEntity.ok().body(findUser);
     }
 
     //테스트 api
