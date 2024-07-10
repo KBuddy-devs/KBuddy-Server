@@ -2,26 +2,29 @@ package com.example.kbuddy_backend.user.entity;
 
 import com.example.kbuddy_backend.common.entity.BaseTimeEntity;
 import com.example.kbuddy_backend.qna.entity.QnaHeart;
+import com.example.kbuddy_backend.user.constant.Country;
+import com.example.kbuddy_backend.user.constant.Gender;
 import com.example.kbuddy_backend.user.constant.OAuthCategory;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import org.springframework.lang.Nullable;
 
 @Getter
@@ -30,41 +33,59 @@ import org.springframework.lang.Nullable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "user_id")
+	private Long id;
 
-    private String firstName;
-    private String lastName;
-    private String username;
-    private String email;
-    private String password;
-    private String bio;
-    private String profileImageUrl;
+	private String firstName;
+	private String lastName;
+	private String username;
+	private String email;
+	private String password;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Authority> authorities = new ArrayList<>();
+	@Enumerated(EnumType.STRING)
+	private Gender gender;
 
-    @Enumerated(EnumType.STRING)
-    @Nullable
-    private OAuthCategory oAuthCategory;
+	@Enumerated(EnumType.STRING)
+	private Country country;
 
-    @OneToMany(mappedBy = "user")
-    private List<QnaHeart> qnaHeart = new ArrayList<>();
+	private String bio;
+	private String profileImageUrl;
 
-    public void addAuthority(Authority authority) {
-        authorities.add(authority);
-        authority.setUser(this);
-    }
-    @Builder
-    public User(String username, String password, String email,String firstName,String lastName,
-                OAuthCategory oAuthCategory) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.oAuthCategory = oAuthCategory;
-    }
+	@OneToMany(cascade = CascadeType.ALL)
+	private List<Authority> authorities = new ArrayList<>();
+
+	@Enumerated(EnumType.STRING)
+	@Nullable
+	private OAuthCategory oAuthCategory;
+
+	@OneToMany(mappedBy = "user")
+	private List<QnaHeart> qnaHeart = new ArrayList<>();
+
+	public void addAuthority(Authority authority) {
+		authorities.add(authority);
+		authority.setUser(this);
+	}
+
+	public void updateBio(String bio) {
+		this.bio = bio;
+	}
+
+	public void resetPassword(String password) {
+		this.password = password;
+	}
+
+	@Builder
+	public User(String username, String password, String email, String firstName, String lastName,Gender gender,Country country,
+		OAuthCategory oAuthCategory) {
+		this.gender = gender;
+		this.country = country;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.oAuthCategory = oAuthCategory;
+	}
 }
