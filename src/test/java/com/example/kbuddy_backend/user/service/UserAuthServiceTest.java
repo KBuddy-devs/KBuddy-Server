@@ -10,6 +10,8 @@ import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenRe
 import com.example.kbuddy_backend.common.IntegrationTest;
 import com.example.kbuddy_backend.common.config.DataInitializer;
 import com.example.kbuddy_backend.fixtures.UserFixtures;
+import com.example.kbuddy_backend.user.constant.Country;
+import com.example.kbuddy_backend.user.constant.Gender;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.entity.User;
@@ -42,7 +44,8 @@ class UserAuthServiceTest extends IntegrationTest {
     @Test
     void loginSuccess() {
         //given
-        RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test","test","test");
+        RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test","test","test", Country.KOREA,
+                Gender.M);
         given(userRepository.save(any(User.class))).willReturn(UserFixtures.createUser());
 
         //when
@@ -87,7 +90,8 @@ class UserAuthServiceTest extends IntegrationTest {
      void checkDuplicatedEmail() {
          //given
          User user = UserFixtures.createUser();
-         RegisterRequest registerRequest = RegisterRequest.of("test", user.getEmail(), "test","test","test");
+         RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test","test","test", Country.KOREA,
+                 Gender.M);
          given(userRepository.findByEmail(anyString())).willReturn(Optional.of(user));
 
          //then
