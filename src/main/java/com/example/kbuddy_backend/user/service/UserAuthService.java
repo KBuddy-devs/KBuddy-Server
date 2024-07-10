@@ -5,6 +5,7 @@ import static com.example.kbuddy_backend.user.constant.UserRole.NORMAL_USER;
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.AuthService;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
+import com.example.kbuddy_backend.user.dto.request.PasswordRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.Authority;
@@ -74,7 +75,7 @@ public class UserAuthService {
 		return authService.createToken(authenticationToken);
 	}
 
-	public UserResponse login(final LoginRequest loginRequest) {
+	public AccessTokenAndRefreshTokenResponse login(final LoginRequest loginRequest) {
 
 		final String email = loginRequest.email();
 		final String password = loginRequest.password();
@@ -90,10 +91,18 @@ public class UserAuthService {
 		if (!passwordEncoder.matches(password, findUser.getPassword())) {
 			throw new InvalidPasswordException();
 		}
+		List<GrantedAuthority> grantedAuthorities = findUser.getAuthorities().stream()
+				.map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName().name()))
+				.collect(Collectors.toList());
+		UsernamePasswordAuthenticationToken authenticationToken =
+				new UsernamePasswordAuthenticationToken(email, password, grantedAuthorities);
 
 		//todo: 토큰 반환으로 수정
-		return UserResponse.of(findUser.getId(), findUser.getUsername(), findUser.getEmail(),
-			findUser.getProfileImageUrl(), findUser.getBio(), findUser.getCreatedDate(), findUser.getFirstName(),
-			findUser.getLastName());
+		return authService.createToken(authenticationToken);
+	}
+
+	@Transactional
+	public void resetPassword(PasswordRequest passwordRequest, User user) {
+		user.resetPassword(passwordEncoder.encode(passwordRequest.password()));
 	}
 }

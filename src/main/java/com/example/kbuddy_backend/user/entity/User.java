@@ -72,6 +72,10 @@ public class User extends BaseTimeEntity {
 		this.bio = bio;
 	}
 
+	public void resetPassword(String password) {
+		this.password = password;
+	}
+
 	@Builder
 	public User(String username, String password, String email, String firstName, String lastName,Gender gender,Country country,
 		OAuthCategory oAuthCategory) {

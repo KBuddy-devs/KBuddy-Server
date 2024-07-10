@@ -2,12 +2,15 @@ package com.example.kbuddy_backend.user.controller;
 
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.MailSendService;
+import com.example.kbuddy_backend.common.config.CurrentUser;
+import com.example.kbuddy_backend.user.dto.request.PasswordRequest;
 import com.example.kbuddy_backend.user.dto.request.EmailCheckRequest;
 import com.example.kbuddy_backend.user.dto.request.EmailRequest;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.dto.response.DefaultResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
+import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.repository.UserRepository;
 import com.example.kbuddy_backend.user.service.UserAuthService;
 import com.example.kbuddy_backend.user.service.UserService;
@@ -39,10 +42,19 @@ public class UserAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody final LoginRequest loginRequest) {
-        UserResponse userResponse = userAuthService.login(loginRequest);
+    public ResponseEntity<AccessTokenAndRefreshTokenResponse> login(@RequestBody final LoginRequest loginRequest) {
+        AccessTokenAndRefreshTokenResponse token = userAuthService.login(loginRequest);
 
-        return ResponseEntity.ok().body(userResponse);
+        return ResponseEntity.ok().body(token);
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<DefaultResponse> resetPassword(@RequestBody final PasswordRequest passwordRequest,
+                                                         @CurrentUser
+                                                         User user) {
+        userAuthService.resetPassword(passwordRequest, user);
+        return ResponseEntity.ok().body(DefaultResponse.of(true, "비밀번호 변경 성공"));
+
     }
 
     //토큰 불필요
@@ -51,9 +63,9 @@ public class UserAuthController {
 
         if (userRepository.findByEmail(request.email()).isPresent()) {
 
-            return ResponseEntity.ok().body(DefaultResponse.of(false,"이메일이 존재합니다."));
+            return ResponseEntity.ok().body(DefaultResponse.of(false, "이메일이 존재합니다."));
         }
-        return ResponseEntity.ok().body(DefaultResponse.of(true,"사용가능한 이메일입니다."));
+        return ResponseEntity.ok().body(DefaultResponse.of(true, "사용가능한 이메일입니다."));
     }
 
 
@@ -61,7 +73,7 @@ public class UserAuthController {
     @PostMapping("/email/send")
     public ResponseEntity<DefaultResponse> mailSend(@RequestBody @Valid EmailRequest emailRequest) {
         String code = mailService.joinEmail(emailRequest.email());
-        return ResponseEntity.ok().body(DefaultResponse.of(true,code));
+        return ResponseEntity.ok().body(DefaultResponse.of(true, code));
     }
 
     //이메일 코드 인증
@@ -69,9 +81,9 @@ public class UserAuthController {
     public ResponseEntity<DefaultResponse> authCheck(@RequestBody @Valid EmailCheckRequest emailCheckRequest) {
         boolean checked = mailService.CheckAuthNum(emailCheckRequest.email(), emailCheckRequest.code());
         if (checked) {
-            return ResponseEntity.ok().body(DefaultResponse.of(true,"인증 성공"));
+            return ResponseEntity.ok().body(DefaultResponse.of(true, "인증 성공"));
         } else {
-            return ResponseEntity.ok().body(DefaultResponse.of(false,"인증 실패"));
+            return ResponseEntity.ok().body(DefaultResponse.of(false, "인증 실패"));
         }
     }
 
