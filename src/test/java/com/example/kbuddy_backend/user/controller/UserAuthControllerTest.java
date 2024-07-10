@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.kbuddy_backend.common.WebMVCTest;
+import com.example.kbuddy_backend.user.constant.Country;
+import com.example.kbuddy_backend.user.constant.Gender;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,8 @@ class UserAuthControllerTest extends WebMVCTest {
     @Test
     void loginSuccess() throws Exception {
         //given
-        RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test","test","test");
+        RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test","test","test", Country.KOREA,
+                Gender.M);
 
         //when
         
