@@ -2,10 +2,8 @@
 
 K-Buddy의 API 서버 입니다.
 
-@author bnbong bbbong9@gmail.com
-
 ## API 문서
-링크 추가 예정
+링크 추가 예정 (외부 링크 첨부 예정)
 
 ## 개발 Stack
 - Language : JAVA 17 openjdk 17.0.9
