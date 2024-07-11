@@ -22,6 +22,8 @@ bin/
 config.properties
 /src/resources/application-oauth.yml
 application-oauth.yml
+### temporary ###
+application-prod.yml
 
 ### IntelliJ IDEA ###
 .idea
