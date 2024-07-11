@@ -14,7 +14,7 @@ on:
 jobs:
   build-server-image:
     if: github.event.pull_request.merged == true
-    name: Test and Build on ARM
+    name: Build on ARM
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -48,6 +48,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
