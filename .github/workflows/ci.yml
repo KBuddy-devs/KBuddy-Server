@@ -34,7 +34,7 @@ jobs:
           images: |
             kbuddydev/k-buddy_server
           flavor: |
-            latest=auto
+            latest=true
           tags: |
             type=sha
 
