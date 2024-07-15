@@ -5,6 +5,7 @@ import static com.example.kbuddy_backend.user.constant.UserRole.NORMAL_USER;
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.AuthService;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
+import com.example.kbuddy_backend.user.dto.request.OAuthRegisterRequest;
 import com.example.kbuddy_backend.user.dto.request.PasswordRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
@@ -71,6 +72,40 @@ public class UserAuthService {
 
 		UsernamePasswordAuthenticationToken authenticationToken =
 			new UsernamePasswordAuthenticationToken(email, password, grantedAuthorities);
+
+		return authService.createToken(authenticationToken);
+	}
+
+	@Transactional
+	public AccessTokenAndRefreshTokenResponse oAuthRegister(final OAuthRegisterRequest registerRequest) {
+
+		final String email = registerRequest.email();
+		final String username = registerRequest.userId();
+
+		Optional<User> user = userRepository.findByEmail(email);
+
+		if (user.isPresent()) {
+			throw new DuplicateUserException();
+		}
+
+		final User newUser = User.builder()
+				.username(username)
+				.oAuthCategory(registerRequest.oAuthCategory())
+				.firstName(registerRequest.firstName())
+				.lastName(registerRequest.lastName())
+				.country(registerRequest.country())
+				.gender(registerRequest.gender())
+				.email(email).build();
+
+		newUser.addAuthority(new Authority(NORMAL_USER));
+		User saveUser = userRepository.save(newUser);
+
+		List<GrantedAuthority> grantedAuthorities = saveUser.getAuthorities().stream()
+				.map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName().name()))
+				.collect(Collectors.toList());
+
+		UsernamePasswordAuthenticationToken authenticationToken =
+				new UsernamePasswordAuthenticationToken(email, "oAuth", grantedAuthorities);
 
 		return authService.createToken(authenticationToken);
 	}

@@ -3,6 +3,7 @@ package com.example.kbuddy_backend.user.controller;
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.MailSendService;
 import com.example.kbuddy_backend.common.config.CurrentUser;
+import com.example.kbuddy_backend.user.dto.request.OAuthRegisterRequest;
 import com.example.kbuddy_backend.user.dto.request.PasswordRequest;
 import com.example.kbuddy_backend.user.dto.request.EmailCheckRequest;
 import com.example.kbuddy_backend.user.dto.request.EmailRequest;
@@ -40,6 +41,14 @@ public class UserAuthController {
         AccessTokenAndRefreshTokenResponse token = userAuthService.register(registerRequest);
         return ResponseEntity.ok().body(token);
     }
+
+    @PostMapping("/oauth/register")
+    public ResponseEntity<AccessTokenAndRefreshTokenResponse> oAuthRegister(
+            @RequestBody final OAuthRegisterRequest registerRequest) {
+        AccessTokenAndRefreshTokenResponse token = userAuthService.oAuthRegister(registerRequest);
+        return ResponseEntity.ok().body(token);
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity<AccessTokenAndRefreshTokenResponse> login(@RequestBody final LoginRequest loginRequest) {
