@@ -133,7 +133,27 @@ public class UserAuthService {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email, password, grantedAuthorities);
 
-        //todo: 토큰 반환으로 수정
+        return authService.createToken(authenticationToken);
+    }
+
+    public AccessTokenAndRefreshTokenResponse oAuthLogin(final OAuthLoginRequest loginRequest) {
+
+        final String email = loginRequest.email();
+
+        final Optional<User> user = userRepository.findByEmailAAndOAuthCategory(email, loginRequest.oAuthCategory());
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        final User findUser = user.get();
+
+        List<GrantedAuthority> grantedAuthorities = findUser.getAuthorities().stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName().name()))
+                .collect(Collectors.toList());
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(email, "oAuth", grantedAuthorities);
+
         return authService.createToken(authenticationToken);
     }
 

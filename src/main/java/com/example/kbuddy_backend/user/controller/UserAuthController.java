@@ -66,6 +66,13 @@ public class UserAuthController {
         return ResponseEntity.ok().body(token);
     }
 
+    @PostMapping("/oauth/login")
+    public ResponseEntity<AccessTokenAndRefreshTokenResponse> oAuthLogin(@RequestBody final OAuthLoginRequest loginRequest) {
+        AccessTokenAndRefreshTokenResponse token = userAuthService.oAuthLogin(loginRequest);
+
+        return ResponseEntity.ok().body(token);
+    }
+
     @PostMapping("/password")
     public ResponseEntity<DefaultResponse> resetPassword(@RequestBody final PasswordRequest passwordRequest,
                                                          @CurrentUser
