@@ -7,9 +7,9 @@ import jakarta.validation.constraints.Email;
 
 //todo: validation
 public record OAuthRegisterRequest(String userId, @Email String email, String password, String firstName, String lastName,
-								   Country country, Gender gender, OAuthCategory oAuthCategory) {
+								   Country country, Gender gender, OAuthCategory oauth) {
 	public static OAuthRegisterRequest of(String userId, String email, String password, String firstName, String lastName,
-                                          Country country, Gender gender, OAuthCategory oAuthCategory) {
-		return new OAuthRegisterRequest(userId, email, password, firstName, lastName, country, gender, oAuthCategory);
+                                          Country country, Gender gender, OAuthCategory oauth) {
+		return new OAuthRegisterRequest(userId, email, password, firstName, lastName, country, gender, oauth);
 	}
 }

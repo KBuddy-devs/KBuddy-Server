@@ -87,7 +87,7 @@ public class UserAuthService {
 
         final User newUser = User.builder()
                 .username(username)
-                .oAuthCategory(registerRequest.oAuthCategory())
+                .oAuthCategory(registerRequest.oauth())
                 .firstName(registerRequest.firstName())
                 .lastName(registerRequest.lastName())
                 .country(registerRequest.country())
@@ -108,7 +108,7 @@ public class UserAuthService {
     }
 
     public boolean checkOAuthUser(final OAuthLoginRequest request) {
-        return userRepository.findByEmailAAndOAuthCategory(request.email(), request.oAuthCategory()).isPresent();
+        return userRepository.findByEmailAndOauthCategory(request.email(), request.oauth()).isPresent();
     }
 
     public AccessTokenAndRefreshTokenResponse login(final LoginRequest loginRequest) {
@@ -140,7 +140,7 @@ public class UserAuthService {
 
         final String email = loginRequest.email();
 
-        final Optional<User> user = userRepository.findByEmailAAndOAuthCategory(email, loginRequest.oAuthCategory());
+        final Optional<User> user = userRepository.findByEmailAndOauthCategory(email, loginRequest.oauth());
 
         if (user.isEmpty()) {
             throw new UserNotFoundException();
