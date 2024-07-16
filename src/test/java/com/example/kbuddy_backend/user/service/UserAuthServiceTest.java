@@ -12,7 +12,10 @@ import com.example.kbuddy_backend.common.config.DataInitializer;
 import com.example.kbuddy_backend.fixtures.UserFixtures;
 import com.example.kbuddy_backend.user.constant.Country;
 import com.example.kbuddy_backend.user.constant.Gender;
+import com.example.kbuddy_backend.user.constant.OAuthCategory;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
+import com.example.kbuddy_backend.user.dto.request.OAuthLoginRequest;
+import com.example.kbuddy_backend.user.dto.request.OAuthRegisterRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.exception.DuplicateUserException;
@@ -25,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
 
 class UserAuthServiceTest extends IntegrationTest {
 
@@ -42,9 +44,9 @@ class UserAuthServiceTest extends IntegrationTest {
 
     @DisplayName("회원가입 성공시 토큰을 반환한다.")
     @Test
-    void loginSuccess() {
+    void registerSuccess() {
         //given
-        RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test","test","test", Country.KOREA,
+        RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test", "test", "test", Country.KOREA,
                 Gender.M);
         given(userRepository.save(any(User.class))).willReturn(UserFixtures.createUser());
 
@@ -54,7 +56,40 @@ class UserAuthServiceTest extends IntegrationTest {
         //then
         assertThat(register).extracting("accessToken").isNotNull();
         assertThat(register).extracting("refreshToken").isNotNull();
-     }
+    }
+
+    @DisplayName("OAuth 회원가입 성공시 토큰을 반환한다.")
+    @Test
+    void oAuthRegisterSuccess() {
+        //given
+        OAuthRegisterRequest registerRequest = OAuthRegisterRequest.of("test", "test", "test", "test", "test",
+                Country.KOREA, Gender.M,
+                OAuthCategory.KAKAO);
+        given(userRepository.save(any(User.class))).willReturn(UserFixtures.createUser());
+        //when
+        AccessTokenAndRefreshTokenResponse register = userAuthService.oAuthRegister(registerRequest);
+
+        //then
+        assertThat(register).extracting("accessToken").isNotNull();
+        assertThat(register).extracting("refreshToken").isNotNull();
+    }
+
+    @DisplayName("OAuth 로그인 성공 시 토큰을 반환한다.")
+    @Test
+    void oAuthLoginSuccess() {
+        //given
+        OAuthLoginRequest loginRequest = OAuthLoginRequest.of("test", OAuthCategory.KAKAO);
+
+        given(userRepository.findByEmailAndOauthCategory(any(String.class),any(OAuthCategory.class))).willReturn(
+                Optional.of(UserFixtures.createOAuthUser()));
+
+        //when
+        AccessTokenAndRefreshTokenResponse register = userAuthService.oAuthLogin(loginRequest);
+
+        //then
+        assertThat(register).extracting("accessToken").isNotNull();
+        assertThat(register).extracting("refreshToken").isNotNull();
+    }
 
     @DisplayName("패스워드가 일치하지 않으면 에러를 던진다.")
     @Test
@@ -71,32 +106,32 @@ class UserAuthServiceTest extends IntegrationTest {
                 .hasMessageContaining("비밀번호가 일치하지 않습니다.");
     }
 
-    
+
     @DisplayName("아이디가 일치하지 않으면 에러를 던진다.")
     @Test
     void checkNotFoundUser() {
         //given
-        LoginRequest loginRequest = LoginRequest.of("test","test");
+        LoginRequest loginRequest = LoginRequest.of("test", "test");
         given(userRepository.findByEmail(anyString())).willReturn(Optional.empty());
-        
+
         //then
         assertThatThrownBy(() -> userAuthService.login(loginRequest))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessageContaining("사용자를 찾을 수 없습니다.");
-     }
-     
-     @DisplayName("중복된 이메일을 확인한다.")
-     @Test
-     void checkDuplicatedEmail() {
-         //given
-         User user = UserFixtures.createUser();
-         RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test","test","test", Country.KOREA,
-                 Gender.M);
-         given(userRepository.findByEmail(anyString())).willReturn(Optional.of(user));
+    }
 
-         //then
-         assertThatThrownBy(() -> userAuthService.register(registerRequest))
-                 .isInstanceOf(DuplicateUserException.class)
-                 .hasMessageContaining("이미 존재하는 사용자입니다.");
-      }
+    @DisplayName("중복된 이메일을 확인한다.")
+    @Test
+    void checkDuplicatedEmail() {
+        //given
+        User user = UserFixtures.createUser();
+        RegisterRequest registerRequest = RegisterRequest.of("test", "test", "test", "test", "test", Country.KOREA,
+                Gender.M);
+        given(userRepository.findByEmail(anyString())).willReturn(Optional.of(user));
+
+        //then
+        assertThatThrownBy(() -> userAuthService.register(registerRequest))
+                .isInstanceOf(DuplicateUserException.class)
+                .hasMessageContaining("이미 존재하는 사용자입니다.");
+    }
 }
