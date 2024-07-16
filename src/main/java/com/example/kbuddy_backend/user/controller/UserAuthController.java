@@ -3,13 +3,14 @@ package com.example.kbuddy_backend.user.controller;
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.MailSendService;
 import com.example.kbuddy_backend.common.config.CurrentUser;
-import com.example.kbuddy_backend.user.dto.request.PasswordRequest;
 import com.example.kbuddy_backend.user.dto.request.EmailCheckRequest;
 import com.example.kbuddy_backend.user.dto.request.EmailRequest;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
+import com.example.kbuddy_backend.user.dto.request.OAuthLoginRequest;
+import com.example.kbuddy_backend.user.dto.request.OAuthRegisterRequest;
+import com.example.kbuddy_backend.user.dto.request.PasswordRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.dto.response.DefaultResponse;
-import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.repository.UserRepository;
 import com.example.kbuddy_backend.user.service.UserAuthService;
@@ -41,9 +42,33 @@ public class UserAuthController {
         return ResponseEntity.ok().body(token);
     }
 
+    @PostMapping("/oauth/register")
+    public ResponseEntity<AccessTokenAndRefreshTokenResponse> oAuthRegister(
+            @RequestBody final OAuthRegisterRequest registerRequest) {
+        AccessTokenAndRefreshTokenResponse token = userAuthService.oAuthRegister(registerRequest);
+        return ResponseEntity.ok().body(token);
+    }
+
+    @PostMapping("/oauth/check")
+    public ResponseEntity<DefaultResponse> checkOAuthUser(
+            @RequestBody final OAuthLoginRequest request) {
+        if (userAuthService.checkOAuthUser(request)) {
+            return ResponseEntity.ok().body(DefaultResponse.of(true, "가입된 내역이 있습니다."));
+        }
+        return ResponseEntity.ok().body(DefaultResponse.of(false, "가입된 내역이 없습니다."));
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<AccessTokenAndRefreshTokenResponse> login(@RequestBody final LoginRequest loginRequest) {
         AccessTokenAndRefreshTokenResponse token = userAuthService.login(loginRequest);
+
+        return ResponseEntity.ok().body(token);
+    }
+
+    @PostMapping("/oauth/login")
+    public ResponseEntity<AccessTokenAndRefreshTokenResponse> oAuthLogin(@RequestBody final OAuthLoginRequest loginRequest) {
+        AccessTokenAndRefreshTokenResponse token = userAuthService.oAuthLogin(loginRequest);
 
         return ResponseEntity.ok().body(token);
     }
