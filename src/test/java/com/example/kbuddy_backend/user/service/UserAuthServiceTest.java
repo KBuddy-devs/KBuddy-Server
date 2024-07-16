@@ -17,6 +17,9 @@ import com.example.kbuddy_backend.user.dto.request.LoginRequest;
 import com.example.kbuddy_backend.user.dto.request.OAuthLoginRequest;
 import com.example.kbuddy_backend.user.dto.request.OAuthLoginRequest;
 import com.example.kbuddy_backend.user.dto.request.OAuthRegisterRequest;
+import com.example.kbuddy_backend.user.dto.request.OAuthRegisterRequest;
+import com.example.kbuddy_backend.user.dto.request.OAuthLoginRequest;
+import com.example.kbuddy_backend.user.dto.request.PasswordRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.exception.DuplicateUserException;
@@ -106,6 +109,7 @@ class UserAuthServiceTest extends IntegrationTest {
             .isInstanceOf(InvalidPasswordException.class)
             .hasMessageContaining("비밀번호가 일치하지 않습니다.");
     }
+
 
 
     @DisplayName("아이디가 일치하지 않으면 에러를 던진다.")
