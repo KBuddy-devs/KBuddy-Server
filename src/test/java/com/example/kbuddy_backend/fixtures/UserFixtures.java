@@ -23,10 +23,10 @@ public class UserFixtures {
     }
 
     public static User createOAuthUser() {
+
         User user = User.builder()
                 .email(EMAIL)
                 .username(USERNAME)
-                .password(PASSWORD)
                 .oAuthCategory(OAuthCategory.KAKAO)
                 .build();
         user.addAuthority(new Authority(NORMAL_USER));
