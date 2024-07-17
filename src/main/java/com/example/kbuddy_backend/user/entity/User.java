@@ -48,6 +48,7 @@ public class User extends BaseTimeEntity {
 
     private String bio;
     private String profileImageUrl;
+    private boolean isActive = true;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Authority> authorities = new ArrayList<>();
@@ -74,7 +75,7 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(String username, String password, String email, String firstName, String lastName, Gender gender,
-                Country country,
+                Country country,String bio,
                 @Nullable OAuthCategory oAuthCategory) {
         this.gender = gender;
         this.country = country;
@@ -83,6 +84,7 @@ public class User extends BaseTimeEntity {
         this.email = email;
         this.username = username;
         this.password = password;
+        this.bio = bio;
         this.oauthCategory = oAuthCategory;
     }
 }

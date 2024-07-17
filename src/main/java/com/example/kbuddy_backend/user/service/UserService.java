@@ -1,9 +1,11 @@
 package com.example.kbuddy_backend.user.service;
 
 import com.example.kbuddy_backend.user.dto.request.UserBioRequest;
+import com.example.kbuddy_backend.user.dto.response.UserAuthorityResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +20,12 @@ public class UserService {
     public UserResponse getUser(User user) {
         User findUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
-        return UserResponse.of(findUser.getId(), findUser.getUsername(), findUser.getEmail(), findUser.getProfileImageUrl(), findUser.getBio(), findUser.getCreatedDate(), findUser.getFirstName(), findUser.getLastName());
+        List<String> authorities = findUser.getAuthorities().stream()
+                .map(authority -> authority.getAuthorityName().name())
+                .toList();
+        return UserResponse.of(findUser.getId(), findUser.getUsername(), findUser.getEmail(), authorities,
+                findUser.getProfileImageUrl(), findUser.getBio(), findUser.getFirstName(), findUser.getLastName(),
+                findUser.getCreatedDate(), findUser.getGender(), findUser.getCountry(),findUser.isActive());
     }
 
     @Transactional

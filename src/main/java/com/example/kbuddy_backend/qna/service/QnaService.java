@@ -23,10 +23,15 @@ public class QnaService {
 
     @Transactional
     public void saveQna(QnaSaveRequest qnaSaveRequest, User user) {
+        
+        //todo: 이미지 저장 추가
 
+        String hashtag = String.join(",", qnaSaveRequest.hashtags());
+        
         Qna qna = Qna.builder()
                 .title(qnaSaveRequest.title())
                 .description(qnaSaveRequest.description())
+                .hashtag(hashtag)
                 .writer(user)
                 .build();
 
@@ -50,7 +55,8 @@ public class QnaService {
     public void minusHeart(Long qnaId, User user) {
 
         Qna qnaById = findQnaById(qnaId);
-        QnaHeart byQnaIdAndUserId = qnaHeartRepository.findByQnaIdAndUserId(qnaId, user.getId()).orElseThrow(QnaNotFoundException::new);
+        QnaHeart byQnaIdAndUserId = qnaHeartRepository.findByQnaIdAndUserId(qnaId, user.getId())
+                .orElseThrow(QnaNotFoundException::new);
         qnaById.minusHeart(byQnaIdAndUserId);
         qnaHeartRepository.deleteByQnaIdAndUserId(qnaId, user.getId());
     }

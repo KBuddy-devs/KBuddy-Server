@@ -41,6 +41,8 @@ public class Qna extends BaseTimeEntity {
     @OneToMany(mappedBy = "qna")
     private List<QnaCategory> category = new ArrayList<>();
 
+    private String hashtag;
+
     private String title;
     private String description;
 
@@ -49,9 +51,10 @@ public class Qna extends BaseTimeEntity {
     private int viewCount;
 
     @Builder
-    public Qna(User writer, String title, String description) {
+    public Qna(User writer, String title, String description,String hashtag) {
         this.writer = writer;
         this.title = title;
+        this.hashtag = hashtag;
         this.description = description;
 
     }
