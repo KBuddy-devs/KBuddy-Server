@@ -7,7 +7,9 @@ import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.service.QnaCommentService;
 import com.example.kbuddy_backend.qna.service.QnaService;
+import com.example.kbuddy_backend.user.dto.response.DefaultResponse;
 import com.example.kbuddy_backend.user.entity.User;
+import lombok.Builder.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,9 +31,9 @@ public class QnaController {
     //todo: 응답 dto 추가
 
     @PostMapping
-    public ResponseEntity<?> saveQna(@RequestBody QnaSaveRequest qnaSaveRequest, @CurrentUser User user) {
+    public ResponseEntity<DefaultResponse> saveQna(@RequestBody QnaSaveRequest qnaSaveRequest, @CurrentUser User user) {
         qnaService.saveQna(qnaSaveRequest, user);
-        return ResponseEntity.ok().body("success");
+        return ResponseEntity.ok().body(DefaultResponse.of(true,"게시글 작성 성공"));
 
     }
 
