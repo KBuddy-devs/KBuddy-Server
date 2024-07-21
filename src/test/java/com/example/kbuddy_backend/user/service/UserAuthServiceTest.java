@@ -147,4 +147,20 @@ class UserAuthServiceTest extends IntegrationTest {
         //then
         assertThat(userAuthService.checkOAuthUser(oAuthLoginRequest)).isTrue();
     }
+
+    @DisplayName("비밀번호가 정상적으로 변경되는지 확인한다.")
+    @Test
+    void checkChangePassword() {
+        //given
+        User user = UserFixtures.createUser();
+        given(userRepository.findByEmail(anyString())).willReturn(Optional.of(user));
+
+        //when
+        userAuthService.resetPassword(PasswordRequest.of("changePassword"), user);
+        AccessTokenAndRefreshTokenResponse changePasswordUser = userAuthService.login(
+            LoginRequest.of(user.getEmail(), "changePassword"));
+        //then
+        assertThat(changePasswordUser).extracting("accessToken").isNotNull();
+        assertThat(changePasswordUser).extracting("refreshToken").isNotNull();
+    }
 }
