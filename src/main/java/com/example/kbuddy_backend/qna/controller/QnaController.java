@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/qna")
+@RequestMapping("kbuddy/v1/qna")
 public class QnaController {
 
     private final QnaService qnaService;
