@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user/auth")
+@RequestMapping("/kbuddy/v1/user/auth")
 public class UserAuthController {
 
     private final UserAuthService userAuthService;
