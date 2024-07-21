@@ -34,7 +34,7 @@ class JwtFilterTest extends WebMVCTest {
         given(tokenProvider.getAuthentication(anyString())).willReturn(authentication);
 
         //then
-        mockMvc.perform(get("/api/v1/user/auth/authentication")
+        mockMvc.perform(get("/kbuddy/v1/user/auth/authentication")
                         .header("Authorization", "Bearer validToken"))
                 .andExpect(status().isOk());
     }
@@ -48,7 +48,7 @@ class JwtFilterTest extends WebMVCTest {
         //when
 
         //then
-        mockMvc.perform(get("/api/v1/user/auth/authentication")
+        mockMvc.perform(get("/kbuddy/v1/user/auth/authentication")
                         .header("Authorization", "Bearer invalidToken"))
                 .andExpect(status().isUnauthorized());
     }
@@ -58,7 +58,7 @@ class JwtFilterTest extends WebMVCTest {
     void checkNullToken() throws Exception {
 
         //then
-        mockMvc.perform(get("/api/v1/user/auth/authentication"))
+        mockMvc.perform(get("/kbuddy/v1/user/auth/authentication"))
                 .andExpect(status().isUnauthorized());
     }
 }
