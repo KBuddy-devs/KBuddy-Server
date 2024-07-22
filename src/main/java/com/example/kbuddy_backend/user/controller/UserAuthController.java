@@ -3,6 +3,7 @@ package com.example.kbuddy_backend.user.controller;
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.MailSendService;
 import com.example.kbuddy_backend.common.config.CurrentUser;
+import com.example.kbuddy_backend.common.exception.BadRequestException;
 import com.example.kbuddy_backend.user.dto.request.EmailCheckRequest;
 import com.example.kbuddy_backend.user.dto.request.EmailRequest;
 import com.example.kbuddy_backend.user.dto.request.LoginRequest;
@@ -16,9 +17,11 @@ import com.example.kbuddy_backend.user.repository.UserRepository;
 import com.example.kbuddy_backend.user.service.UserAuthService;
 import com.example.kbuddy_backend.user.service.UserService;
 import jakarta.validation.Valid;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,14 +40,23 @@ public class UserAuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AccessTokenAndRefreshTokenResponse> register(
-            @RequestBody final RegisterRequest registerRequest) {
+            @Valid @RequestBody final RegisterRequest registerRequest, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new BadRequestException(Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+        }
         AccessTokenAndRefreshTokenResponse token = userAuthService.register(registerRequest);
         return ResponseEntity.ok().body(token);
     }
 
     @PostMapping("/oauth/register")
     public ResponseEntity<AccessTokenAndRefreshTokenResponse> oAuthRegister(
-            @RequestBody final OAuthRegisterRequest registerRequest) {
+            @RequestBody final OAuthRegisterRequest registerRequest, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            throw new IllegalArgumentException(Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+        }
+
         AccessTokenAndRefreshTokenResponse token = userAuthService.oAuthRegister(registerRequest);
         return ResponseEntity.ok().body(token);
     }
