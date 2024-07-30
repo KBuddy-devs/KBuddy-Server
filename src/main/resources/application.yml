@@ -47,3 +47,12 @@ springdoc:
   model-and-view-allowed: true
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+cloud:
+  naver:
+    s3:
+      bucket: kbuddybucket
+      region: kr-standard
+      endPoint: https://kr.object.ncloudstorage.com
+      accessKey: ncp_iam_BPAMKR5Sbh4W2XBQ4FkV
+      secretKey: ncp_iam_BPAMKR5Sbh4W2XBQ4FkV
