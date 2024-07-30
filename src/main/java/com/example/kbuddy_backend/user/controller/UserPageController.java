@@ -29,8 +29,8 @@ public class UserPageController {
     }
 
     @PostMapping("/bio")
-    public ResponseEntity<DefaultResponse> saveUserBio(@RequestBody UserBioRequest request, @CurrentUser User user) {
+    public ResponseEntity<String> saveUserBio(@RequestBody UserBioRequest request, @CurrentUser User user) {
         userService.saveUserBio(request, user);
-        return ResponseEntity.ok().body(DefaultResponse.of(true, "성공적으로 저장되었습니다."));
+        return ResponseEntity.ok().body("성공적으로 저장되었습니다.");
     }
 }
