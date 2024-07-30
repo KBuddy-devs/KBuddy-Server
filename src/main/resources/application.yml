@@ -1,4 +1,8 @@
+
 spring:
+  web:
+    resources:
+      add-mappings: false
   datasource:
     url: jdbc:h2:mem:test;
     driver-class-name: org.h2.Driver
