@@ -19,6 +19,7 @@ import com.example.kbuddy_backend.user.service.UserService;
 import jakarta.validation.Valid;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -46,7 +47,7 @@ public class UserAuthController {
             throw new BadRequestException(Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
         }
         AccessTokenAndRefreshTokenResponse token = userAuthService.register(registerRequest);
-        return ResponseEntity.ok().body(token);
+        return ResponseEntity.status(HttpStatus.CREATED).body(token);
     }
 
     @PostMapping("/oauth/register")
@@ -54,11 +55,12 @@ public class UserAuthController {
             @RequestBody final OAuthRegisterRequest registerRequest, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            throw new IllegalArgumentException(Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+            throw new IllegalArgumentException(
+                    Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
         }
 
         AccessTokenAndRefreshTokenResponse token = userAuthService.oAuthRegister(registerRequest);
-        return ResponseEntity.ok().body(token);
+        return ResponseEntity.status(HttpStatus.CREATED).body(token);
     }
 
     @PostMapping("/oauth/check")
@@ -74,23 +76,23 @@ public class UserAuthController {
     @PostMapping("/login")
     public ResponseEntity<AccessTokenAndRefreshTokenResponse> login(@RequestBody final LoginRequest loginRequest) {
         AccessTokenAndRefreshTokenResponse token = userAuthService.login(loginRequest);
-
         return ResponseEntity.ok().body(token);
     }
 
     @PostMapping("/oauth/login")
-    public ResponseEntity<AccessTokenAndRefreshTokenResponse> oAuthLogin(@RequestBody final OAuthLoginRequest loginRequest) {
+    public ResponseEntity<AccessTokenAndRefreshTokenResponse> oAuthLogin(
+            @RequestBody final OAuthLoginRequest loginRequest) {
         AccessTokenAndRefreshTokenResponse token = userAuthService.oAuthLogin(loginRequest);
 
         return ResponseEntity.ok().body(token);
     }
 
     @PostMapping("/password")
-    public ResponseEntity<DefaultResponse> resetPassword(@RequestBody final PasswordRequest passwordRequest,
-                                                         @CurrentUser
-                                                         User user) {
+    public ResponseEntity<String> resetPassword(@RequestBody final PasswordRequest passwordRequest,
+                                                @CurrentUser
+                                                User user) {
         userAuthService.resetPassword(passwordRequest, user);
-        return ResponseEntity.ok().body(DefaultResponse.of(true, "비밀번호 변경 성공"));
+        return ResponseEntity.ok().body("비밀번호 변경 성공");
 
     }
 
@@ -108,9 +110,9 @@ public class UserAuthController {
 
     //이메일 코드 전송
     @PostMapping("/email/send")
-    public ResponseEntity<DefaultResponse> mailSend(@RequestBody @Valid EmailRequest emailRequest) {
+    public ResponseEntity<String> mailSend(@RequestBody @Valid EmailRequest emailRequest) {
         String code = mailService.joinEmail(emailRequest.email());
-        return ResponseEntity.ok().body(DefaultResponse.of(true, code));
+        return ResponseEntity.ok().body(code);
     }
 
     //이메일 코드 인증
@@ -126,8 +128,10 @@ public class UserAuthController {
 
     //테스트 api
     @GetMapping("/authentication")
-    public ResponseEntity<Authentication> getUserAuthentication(Authentication authentication) {
+    public ResponseEntity<Authentication>
+    getUserAuthentication(Authentication authentication) {
 
         return ResponseEntity.ok().body(authentication);
     }
+
 }
