@@ -1,5 +1,9 @@
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
   web:
     resources:
       add-mappings: false
@@ -48,6 +52,7 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
 
+#별도 키 저장 파일 분리 필요
 cloud:
   naver:
     s3:
@@ -55,4 +60,4 @@ cloud:
       region: kr-standard
       endPoint: https://kr.object.ncloudstorage.com
       accessKey: ncp_iam_BPAMKR5Sbh4W2XBQ4FkV
-      secretKey: ncp_iam_BPAMKR5Sbh4W2XBQ4FkV
+      secretKey: ncp_iam_BPKMKRDDHPLjypEmVTxa88pFPGGQuFa2V7

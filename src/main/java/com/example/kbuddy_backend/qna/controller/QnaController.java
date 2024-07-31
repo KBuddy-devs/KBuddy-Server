@@ -7,9 +7,8 @@ import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.service.QnaCommentService;
 import com.example.kbuddy_backend.qna.service.QnaService;
-import com.example.kbuddy_backend.user.dto.response.DefaultResponse;
 import com.example.kbuddy_backend.user.entity.User;
-import lombok.Builder.Default;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,8 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,12 +30,10 @@ public class QnaController {
     private final QnaCommentService qnaCommentService;
 
     //todo: 응답 dto 추가
-
     @PostMapping
-    public ResponseEntity<DefaultResponse> saveQna(@RequestBody QnaSaveRequest qnaSaveRequest, @CurrentUser User user) {
-        qnaService.saveQna(qnaSaveRequest, user);
-        return ResponseEntity.ok().body(DefaultResponse.of(true,"게시글 작성 성공"));
-
+    public ResponseEntity<String> saveQna(@RequestPart(required = false) List<MultipartFile> images, @RequestPart(value = "request") QnaSaveRequest qnaSaveRequest, @CurrentUser User user) {
+        qnaService.saveQna(qnaSaveRequest,images, user);
+        return ResponseEntity.ok().body("게시글 작성 성공");
     }
 
     @GetMapping("/{qnaId}")
@@ -43,6 +41,7 @@ public class QnaController {
         QnaResponse qna = qnaService.getQna(qnaId);
         return ResponseEntity.ok().body(qna);
     }
+
 
     @PostMapping("/{qnaId}/comment")
     public ResponseEntity<?> saveQnaComment(@PathVariable Long qnaId,@RequestBody QnaCommentSaveRequest qnaCommentSaveRequest,

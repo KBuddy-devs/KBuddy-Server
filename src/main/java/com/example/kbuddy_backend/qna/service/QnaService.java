@@ -1,17 +1,25 @@
 package com.example.kbuddy_backend.qna.service;
 
+import com.example.kbuddy_backend.qna.constant.QnaCategoryEnum;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.entity.Qna;
 import com.example.kbuddy_backend.qna.entity.QnaHeart;
+import com.example.kbuddy_backend.qna.entity.QnaImage;
 import com.example.kbuddy_backend.qna.exception.DuplicatedQnaHeartException;
 import com.example.kbuddy_backend.qna.exception.QnaNotFoundException;
 import com.example.kbuddy_backend.qna.repository.QnaHeartRepository;
 import com.example.kbuddy_backend.qna.repository.QnaRepository;
+import com.example.kbuddy_backend.s3.dto.response.S3Response;
+import com.example.kbuddy_backend.s3.exception.ImageUploadException;
+import com.example.kbuddy_backend.s3.service.S3Service;
 import com.example.kbuddy_backend.user.entity.User;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional(readOnly = true)
@@ -20,22 +28,44 @@ public class QnaService {
 
     private final QnaRepository qnaRepository;
     private final QnaHeartRepository qnaHeartRepository;
+    private final S3Service s3Service;
+    private static final String FOLDER_NAME = "qna";
 
     @Transactional
-    public void saveQna(QnaSaveRequest qnaSaveRequest, User user) {
-        
-        //todo: 이미지 저장 추가
+    public void saveQna(QnaSaveRequest qnaSaveRequest, List<MultipartFile> imageFiles, User user) {
 
         String hashtag = String.join(",", qnaSaveRequest.hashtags());
-        
+        Optional<QnaCategoryEnum> categoryById = QnaCategoryEnum.findCategoryById(qnaSaveRequest.categoryId());
+        if (categoryById.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 카테고리입니다.");
+        }
         Qna qna = Qna.builder()
                 .title(qnaSaveRequest.title())
                 .description(qnaSaveRequest.description())
                 .hashtag(hashtag)
+                .category(categoryById.get())
                 .writer(user)
                 .build();
 
+        //todo: 트랜잭션 실패 시 이미지 삭제하는 로직 추가
+        if (imageFiles != null && !imageFiles.isEmpty()) {
+            saveImageFiles(imageFiles, qna);
+        }
         qnaRepository.save(qna);
+    }
+
+    private void saveImageFiles(List<MultipartFile> imageFiles, Qna qna) {
+        for (MultipartFile imageFile : imageFiles) {
+            if (!s3Service.checkImageFile(imageFile)) {
+                throw new ImageUploadException("이미지 파일이 아닙니다.");
+            }
+            S3Response s3Response = s3Service.saveFileWithUUID(imageFile, FOLDER_NAME);
+            QnaImage qnaImage = QnaImage.builder()
+                    .qna(qna)
+                    .imageUrl(s3Response.s3ImageUrl())
+                    .build();
+            qna.addImage(qnaImage);
+        }
     }
 
 

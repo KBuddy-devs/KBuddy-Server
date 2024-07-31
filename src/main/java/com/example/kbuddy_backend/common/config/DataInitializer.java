@@ -4,6 +4,7 @@ import static com.example.kbuddy_backend.user.constant.UserRole.NORMAL_USER;
 
 import com.example.kbuddy_backend.auth.dto.response.AccessTokenAndRefreshTokenResponse;
 import com.example.kbuddy_backend.auth.service.AuthService;
+import com.example.kbuddy_backend.qna.constant.QnaCategoryEnum;
 import com.example.kbuddy_backend.qna.entity.Qna;
 import com.example.kbuddy_backend.qna.repository.QnaRepository;
 import com.example.kbuddy_backend.user.constant.Country;
@@ -21,7 +22,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -63,8 +63,18 @@ public class DataInitializer {
         Qna qna = Qna.builder()
                 .title("Dummy Title")
                 .description("Dummy Description")
+                .category(QnaCategoryEnum.VISA)
                 .writer(user)
                 .build();
         qnaRepository.save(qna);
+
+        // QnA 카테고리 생성
+//        QnaCategory qnaCategory1 = new QnaCategory("VISA");
+//        QnaCategory qnaCategory2 = new QnaCategory("FOOD");
+//        QnaCategory qnaCategory3 = new QnaCategory("HOSPITAL");
+//        qnaCategoryRepository.save(qnaCategory1);
+//        qnaCategoryRepository.save(qnaCategory2);
+//        qnaCategoryRepository.save(qnaCategory3);
+
     }
 }

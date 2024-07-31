@@ -23,10 +23,12 @@ public class QnaCategory {
     @Column(name = "category_id")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private QnaCategoryEnum category;
+//    @Enumerated(EnumType.STRING)
+//    private QnaCategoryEnum category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "qna_id")
-    private Qna qna;
+    private String category;
+
+    public QnaCategory(String category) {
+        this.category = category;
+    }
 }
