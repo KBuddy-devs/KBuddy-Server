@@ -4,30 +4,61 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Properties;
+
 @Configuration
 public class EmailConfig {
+
+    @Value("${spring.mail.host}")
+    private String host;
+
+    @Value("${spring.mail.port}")
+    private int port;
+
+    @Value("${spring.mail.username}")
+    private String username;
+
+    @Value("${spring.mail.password}")
+    private String password;
+
+    @Value("${spring.mail.properties.mail.transport.protocol}")
+    private String protocol;
+
+    @Value("${spring.mail.properties.mail.smtp.auth}")
+    private boolean auth;
+
+    @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
+    private boolean starttlsEnable;
+
+    @Value("${spring.mail.properties.mail.smtp.ssl.trust}")
+    private String sslTrust;
+
+    @Value("${spring.mail.properties.mail.smtp.ssl.protocols}")
+    private String sslProtocols;
+
+    @Value("${spring.mail.properties.mail.debug}")
+    private boolean debug;
+
     @Bean
-    public JavaMailSender mailSender() {//JAVA MAILSENDER 인터페이스를 구현한 객체를 빈으로 등록하기 위함.
-
+    public JavaMailSender mailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");// 속성을 넣기 시작합니다. 이메일 전송에 사용할 SMTP 서버 호스트를 설정
-        mailSender.setPort(587);// 587로 포트를 지정
-        mailSender.setUsername("tripcompany77@gmail.com");
-        mailSender.setPassword("rexgraghaadpqpsn");//구글 앱 비밀번호
+        mailSender.setHost(host);
+        mailSender.setPort(port);
+        mailSender.setUsername(username);
+        mailSender.setPassword(password);
 
-        Properties javaMailProperties = new Properties();//JavaMail의 속성을 설정하기 위해 Properties 객체를 생성
-        javaMailProperties.put("mail.transport.protocol", "smtp");//프로토콜로 smtp 사용
-        javaMailProperties.put("mail.smtp.auth", "true");//smtp 서버에 인증이 필요
-        javaMailProperties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");//SSL 소켓 팩토리 클래스 사용
-        javaMailProperties.put("mail.smtp.starttls.enable", "true");//STARTTLS(TLS를 시작하는 명령)를 사용하여 암호화된 통신을 활성화
-        javaMailProperties.put("mail.debug", "true");//디버깅 정보 출력
-        javaMailProperties.put("mail.smtp.ssl.trust", "smtp.naver.com");//smtp 서버의 ssl 인증서를 신뢰
-        javaMailProperties.put("mail.smtp.ssl.protocols", "TLSv1.2");//사용할 ssl 프로토콜 버젼
+        Properties javaMailProperties = new Properties();
+        javaMailProperties.put("mail.transport.protocol", protocol);
+        javaMailProperties.put("mail.smtp.auth", auth);
+        javaMailProperties.put("mail.smtp.starttls.enable", starttlsEnable);
+        javaMailProperties.put("mail.smtp.ssl.trust", sslTrust);
+        javaMailProperties.put("mail.smtp.ssl.protocols", sslProtocols);
+        javaMailProperties.put("mail.debug", debug);
 
-        mailSender.setJavaMailProperties(javaMailProperties);//mailSender에 우리가 만든 properties 넣고
+        mailSender.setJavaMailProperties(javaMailProperties);
 
-        return mailSender;//빈으로 등록한다.
+        return mailSender;
     }
 }
