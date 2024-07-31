@@ -24,10 +24,13 @@ jobs:
         with:
           platforms: arm64
 
-      - name: Set environment variables
+      - name: Create .env file
         run: |
-          echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> $GITHUB_ENV
-          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" > src/main/resources/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> src/main/resources/.env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> src/main/resources/.env
+          echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> src/main/resources/.env
+          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> src/main/resources/.env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
