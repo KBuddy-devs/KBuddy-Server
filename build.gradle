@@ -11,6 +11,10 @@ java {
     sourceCompatibility = '17'
 }
 
+test {
+    systemProperty 'spring.profiles.active', 'dev'
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
