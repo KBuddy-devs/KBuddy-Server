@@ -11,5 +11,6 @@ RUN ./gradlew bootjar
 ENV TZ=Asia/Seoul
 FROM openjdk:17-jdk-slim
 COPY --from=builder build/libs/*.jar app.jar
+COPY --from=builder .env .env
 EXPOSE 8080
 ENTRYPOINT ["java","-Dspring.profiles.active=default","-Duser.timezone=Asia/Seoul","-jar","/app.jar"]
