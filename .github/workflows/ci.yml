@@ -26,11 +26,11 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "DB_USER=${{ secrets.DB_USER }}" > src/main/resources/.env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> src/main/resources/.env
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> src/main/resources/.env
-          echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> src/main/resources/.env
-          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> src/main/resources/.env
+          echo "DB_USER=${{ secrets.DB_USER }}" > .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+          echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> .env
+          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
