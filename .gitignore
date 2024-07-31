@@ -24,7 +24,7 @@ config.properties
 application-oauth.yml
 ### temporary ###
 #application-prod.yml
-src/main/resources/.env
+.env
 
 ### IntelliJ IDEA ###
 .idea
