@@ -102,7 +102,7 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public void validateToken(final String token) {
-        Jws<Claims> claims = Jwts.parserBuilder()
+        Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);

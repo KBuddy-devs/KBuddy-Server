@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.kbuddy_backend.auth.token.JwtTokenProvider;
 import com.example.kbuddy_backend.common.SecurityTest;
 import com.example.kbuddy_backend.common.WebMVCTest;
+import io.jsonwebtoken.JwtException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,6 @@ class JwtFilterTest extends WebMVCTest {
         final UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken("email", "password", grantedAuthorities);
 
-        given(tokenProvider.validateToken(anyString())).willReturn(true);
         given(tokenProvider.getAuthentication(anyString())).willReturn(authentication);
 
         //then
@@ -43,8 +43,6 @@ class JwtFilterTest extends WebMVCTest {
     @Test
     void checkInValidToken() throws Exception {
         //given
-        given(tokenProvider.validateToken(anyString())).willReturn(false);
-
         //when
 
         //then

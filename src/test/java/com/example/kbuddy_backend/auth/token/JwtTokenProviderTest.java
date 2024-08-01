@@ -2,17 +2,16 @@ package com.example.kbuddy_backend.auth.token;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.example.kbuddy_backend.auth.dto.response.TokenResponse;
 import com.example.kbuddy_backend.common.WebMVCTest;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import javax.crypto.SecretKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,21 +26,11 @@ class JwtTokenProviderTest extends WebMVCTest {
     @Test
     void isExpiredToken() {
 
-        //given
-        final Date now = new Date();
-        final Date validity = new Date(now.getTime() + 3600000);
-        final SecretKey keys = Keys.hmacShaKeyFor(TEST_SECRET_KEY.getBytes(StandardCharsets.UTF_8));
-
-        //when
-        final String token = Jwts.builder()
-                .setSubject("test")
-                .setIssuedAt(new Date(now.getTime() - 100))
-                .setExpiration(validity)
-                .signWith(keys, SignatureAlgorithm.HS256)
-                .compact();
-
+        TokenResponse invalidTokens = createInvalidTokens();
         //then
-        assertThat(tokenProvider.validateToken(token)).isFalse();
+        assertThrows(ExpiredJwtException.class, () -> {
+            tokenProvider.validateToken(invalidTokens.token());
+        });
     }
 
     @DisplayName("유효한 토큰을 검증한다.")
@@ -53,7 +42,8 @@ class JwtTokenProviderTest extends WebMVCTest {
         TokenResponse token = createTokens();
 
         //then
-        assertThat(tokenProvider.validateToken(token.token())).isTrue();
+        assertDoesNotThrow(() -> tokenProvider.validateToken(token.token()));
+
     }
 
 
@@ -62,10 +52,12 @@ class JwtTokenProviderTest extends WebMVCTest {
     void isUnValidatedToken() {
         //given
         TokenResponse token = createTokens();
-        String unValidatedToken = token.token() + "invalid";
+        String inValidatedToken = token.token() + "invalid";
 
         //then
-        assertThat(tokenProvider.validateToken(unValidatedToken)).isFalse();
+        assertThrows(JwtException.class, () -> {
+            tokenProvider.validateToken(inValidatedToken);
+        });
     }
 
     @DisplayName("토큰에 포함된 인증 정보를 확인한다.")
@@ -89,5 +81,13 @@ class JwtTokenProviderTest extends WebMVCTest {
         final UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken("email", "password", grantedAuthorities);
         return tokenProvider.createToken(authenticationToken, 3600);
+    }
+
+    private TokenResponse createInvalidTokens() {
+
+        final List<GrantedAuthority> grantedAuthorities = List.of(() -> "ROLE_USER");
+        final UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken("email", "password", grantedAuthorities);
+        return tokenProvider.createToken(authenticationToken, 0);
     }
 }
