@@ -1,13 +1,10 @@
 package com.example.kbuddy_backend.qna.entity;
 
 import com.example.kbuddy_backend.common.entity.BaseTimeEntity;
-import com.example.kbuddy_backend.qna.constant.QnaCategoryEnum;
 import com.example.kbuddy_backend.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -47,8 +45,9 @@ public class Qna extends BaseTimeEntity {
 
     private String hashtag;
 
-    @Enumerated(EnumType.STRING)
-    private QnaCategoryEnum category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private QnaCategory category;
     private String title;
     private String description;
 
@@ -57,13 +56,12 @@ public class Qna extends BaseTimeEntity {
     private int viewCount;
 
     @Builder
-    public Qna(User writer, String title, String description, String hashtag,QnaCategoryEnum category) {
+    public Qna(User writer, String title, String description, String hashtag, QnaCategory category) {
         this.writer = writer;
         this.title = title;
         this.hashtag = hashtag;
-        this.description = description;
         this.category = category;
-
+        this.description = description;
     }
 
     public void addImage(QnaImage qnaImage) {

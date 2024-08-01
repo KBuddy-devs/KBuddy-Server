@@ -12,7 +12,7 @@ public interface TokenProvider {
 
     Authentication getAuthentication(final String token);
 
-    boolean validateToken(final String token);
+    void validateToken(final String token);
 
     long getAccessTokenExpiryDuration();
     long getRefreshTokenExpiryDuration();

@@ -1,13 +1,14 @@
 package com.example.kbuddy_backend.qna.service;
 
-import com.example.kbuddy_backend.qna.constant.QnaCategoryEnum;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.entity.Qna;
+import com.example.kbuddy_backend.qna.entity.QnaCategory;
 import com.example.kbuddy_backend.qna.entity.QnaHeart;
 import com.example.kbuddy_backend.qna.entity.QnaImage;
 import com.example.kbuddy_backend.qna.exception.DuplicatedQnaHeartException;
 import com.example.kbuddy_backend.qna.exception.QnaNotFoundException;
+import com.example.kbuddy_backend.qna.repository.QnaCategoryRepository;
 import com.example.kbuddy_backend.qna.repository.QnaHeartRepository;
 import com.example.kbuddy_backend.qna.repository.QnaRepository;
 import com.example.kbuddy_backend.s3.dto.response.S3Response;
@@ -28,6 +29,7 @@ public class QnaService {
 
     private final QnaRepository qnaRepository;
     private final QnaHeartRepository qnaHeartRepository;
+    private final QnaCategoryRepository qnaCategoryRepository;
     private final S3Service s3Service;
     private static final String FOLDER_NAME = "qna";
 
@@ -35,15 +37,15 @@ public class QnaService {
     public void saveQna(QnaSaveRequest qnaSaveRequest, List<MultipartFile> imageFiles, User user) {
 
         String hashtag = String.join(",", qnaSaveRequest.hashtags());
-        Optional<QnaCategoryEnum> categoryById = QnaCategoryEnum.findCategoryById(qnaSaveRequest.categoryId());
-        if (categoryById.isEmpty()) {
+        Optional<QnaCategory> qnaCategory = qnaCategoryRepository.findById(qnaSaveRequest.categoryId());
+        if (qnaCategory.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 카테고리입니다.");
         }
         Qna qna = Qna.builder()
                 .title(qnaSaveRequest.title())
                 .description(qnaSaveRequest.description())
+                .category(qnaCategory.get())
                 .hashtag(hashtag)
-                .category(categoryById.get())
                 .writer(user)
                 .build();
 

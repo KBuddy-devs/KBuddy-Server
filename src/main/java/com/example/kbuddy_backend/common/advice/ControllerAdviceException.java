@@ -12,6 +12,7 @@ import com.example.kbuddy_backend.common.advice.response.ErrorResponse;
 import com.example.kbuddy_backend.common.exception.BadRequestException;
 import com.example.kbuddy_backend.common.exception.NotFoundException;
 import com.example.kbuddy_backend.common.exception.UnauthorizedException;
+import com.example.kbuddy_backend.s3.exception.ImageUploadException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -52,7 +53,8 @@ public class ControllerAdviceException {
         return ResponseEntity.status(NOT_FOUND).body(new ErrorResponse(e.getMessage(), CustomCode.HTTP_404));
     }
 
-    @ExceptionHandler({BadRequestException.class, IllegalArgumentException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({BadRequestException.class, IllegalArgumentException.class, HttpMessageNotReadableException.class,
+            ImageUploadException.class})
     public ResponseEntity<ErrorResponse> handleBadRequest(final Exception e) {
         log.error(e.getMessage());
         return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage(), CustomCode.HTTP_400));
@@ -69,7 +71,7 @@ public class ControllerAdviceException {
     public ResponseEntity<ErrorResponse> handleInternalServerError(final Exception e) {
         log.error("Internal Server Error: ", e);
         return ResponseEntity.status(INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse("서버에서 예기치 못한 오류가 발생했습니다.", CustomCode.HTTP_500));
+                .body(new ErrorResponse(e.getMessage(), CustomCode.HTTP_500));
     }
 
 }
