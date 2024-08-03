@@ -1,5 +1,6 @@
 package com.example.kbuddy_backend.qna.service;
 
+import com.example.kbuddy_backend.qna.dto.request.QnaImageRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaUpdateRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaCommentResponse;
@@ -12,8 +13,8 @@ import com.example.kbuddy_backend.qna.exception.DuplicatedQnaHeartException;
 import com.example.kbuddy_backend.qna.exception.NotWriterException;
 import com.example.kbuddy_backend.qna.exception.QnaNotFoundException;
 import com.example.kbuddy_backend.qna.repository.QnaCategoryRepository;
-import com.example.kbuddy_backend.qna.repository.QnaCommentRepository;
 import com.example.kbuddy_backend.qna.repository.QnaHeartRepository;
+import com.example.kbuddy_backend.qna.repository.QnaImageRepository;
 import com.example.kbuddy_backend.qna.repository.QnaRepository;
 import com.example.kbuddy_backend.s3.dto.response.S3Response;
 import com.example.kbuddy_backend.s3.exception.ImageUploadException;
@@ -37,10 +38,10 @@ public class QnaService {
 
 	private final QnaRepository qnaRepository;
 	private final QnaHeartRepository qnaHeartRepository;
-	private final QnaCommentRepository qnaCommentRepository;
 	private final QnaCategoryRepository qnaCategoryRepository;
 	private final S3Service s3Service;
 	private static final String FOLDER_NAME = "qna";
+	private final QnaImageRepository qnaImageRepository;
 
 	@Transactional
 	public QnaResponse saveQna(QnaSaveRequest qnaSaveRequest, List<MultipartFile> imageFiles, User user) {
@@ -60,7 +61,6 @@ public class QnaService {
 		if (imageFiles != null && !imageFiles.isEmpty()) {
 			saveImageFiles(imageFiles, qna);
 		}
-
 		Qna saveQna = qnaRepository.save(qna);
 		return createQnaResponseDto(saveQna);
 	}
@@ -99,6 +99,16 @@ public class QnaService {
 	}
 
 	@Transactional
+	public void deleteImages(Long qnaId, QnaImageRequest images, User user) {
+		Qna qna = findQnaById(qnaId);
+		isQnaWriter(user, qna);
+		for (String image : images.images()) {
+			s3Service.deleteFile(image);
+			qna.deleteImage(image);
+		}
+	}
+
+	@Transactional
 	public void deleteQna(Long qnaId, User user) {
 		Qna qna = qnaRepository.findById(qnaId).orElseThrow(QnaNotFoundException::new);
 
@@ -108,7 +118,12 @@ public class QnaService {
 	}
 
 	private QnaResponse createQnaResponseDto(Qna qna) {
-		List<String> images = qna.getImageUrls().stream().map(QnaImage::getImageUrl).toList();
+		List<S3Response> images = qna.getImageUrls()
+			.stream()
+			.map(qnaImage -> new S3Response(qnaImage.getOriginalFileName(), qnaImage.getFilePath(),
+				qnaImage.getImageUrl()
+			))
+			.toList();
 		List<QnaCommentResponse> comments = qna.getComments()
 			.stream()
 			.map(qnaComment ->
@@ -124,15 +139,20 @@ public class QnaService {
 	}
 
 	private void saveImageFiles(List<MultipartFile> imageFiles, Qna qna) {
+
 		for (MultipartFile imageFile : imageFiles) {
 			if (!s3Service.checkImageFile(imageFile)) {
 				throw new ImageUploadException("이미지 파일이 아닙니다.");
 			}
 			S3Response s3Response = s3Service.saveFileWithUUID(imageFile, FOLDER_NAME);
+
 			QnaImage qnaImage = QnaImage.builder()
 				.qna(qna)
 				.imageUrl(s3Response.s3ImageUrl())
+				.filePath(s3Response.filePath())
+				.originalFileName(s3Response.originalFileName())
 				.build();
+
 			qna.addImage(qnaImage);
 		}
 	}
@@ -167,8 +187,6 @@ public class QnaService {
 		return qnaCategoryRepository.findById(categoryId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
 	}
-
-
 
 	//todo: commentCount 수정
 
