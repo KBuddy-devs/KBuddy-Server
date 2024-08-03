@@ -41,14 +41,6 @@ public class QnaComment extends BaseTimeEntity {
     @OneToMany(mappedBy = "qnaComment")
     private List<QnaHeart> qnaHearts = new ArrayList<>();
 
-    //대댓글
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private QnaComment parent;
-
-    @OneToMany(mappedBy = "parent")
-    private List<QnaComment> children = new ArrayList<>();
-
     private int heartCount;
 
     public void setQna(Qna qna) {

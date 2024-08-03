@@ -10,7 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Entity
 public class QnaImage {
 

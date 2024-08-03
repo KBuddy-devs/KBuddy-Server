@@ -1,6 +1,7 @@
 package com.example.kbuddy_backend.qna.controller;
 
 
+import com.amazonaws.Response;
 import com.example.kbuddy_backend.common.config.CurrentUser;
 import com.example.kbuddy_backend.qna.dto.request.QnaCommentSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
@@ -31,9 +32,9 @@ public class QnaController {
 
     //todo: 응답 dto 추가
     @PostMapping
-    public ResponseEntity<String> saveQna(@RequestPart(required = false) List<MultipartFile> images, @RequestPart(value = "request") QnaSaveRequest qnaSaveRequest, @CurrentUser User user) {
-        qnaService.saveQna(qnaSaveRequest,images, user);
-        return ResponseEntity.ok().body("게시글 작성 성공");
+    public ResponseEntity<QnaResponse> saveQna(@RequestPart(required = false) List<MultipartFile> images, @RequestPart(value = "request") QnaSaveRequest qnaSaveRequest, @CurrentUser User user) {
+        QnaResponse qnaResponse = qnaService.saveQna(qnaSaveRequest, images, user);
+        return ResponseEntity.ok().body(qnaResponse);
     }
 
     @GetMapping("/{qnaId}")
@@ -42,6 +43,12 @@ public class QnaController {
         return ResponseEntity.ok().body(qna);
     }
 
+    @DeleteMapping("/{qnaId}")
+    public ResponseEntity<String> deleteQna(@PathVariable Long qnaId, @CurrentUser User user) {
+        qnaService.deleteQna(qnaId, user);
+        return ResponseEntity.ok().body("QnA가 성공적으로 삭제되었습니다.");
+
+    }
 
     @PostMapping("/{qnaId}/comment")
     public ResponseEntity<?> saveQnaComment(@PathVariable Long qnaId,@RequestBody QnaCommentSaveRequest qnaCommentSaveRequest,
