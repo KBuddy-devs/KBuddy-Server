@@ -92,6 +92,13 @@ public class QnaService {
 	}
 
 	@Transactional
+	public void addImages(Long qnaId, List<MultipartFile> images, User user) {
+		Qna qna = findQnaById(qnaId);
+		isQnaWriter(user, qna);
+		saveImageFiles(images, qna);
+	}
+
+	@Transactional
 	public void deleteQna(Long qnaId, User user) {
 		Qna qna = qnaRepository.findById(qnaId).orElseThrow(QnaNotFoundException::new);
 
@@ -160,6 +167,8 @@ public class QnaService {
 		return qnaCategoryRepository.findById(categoryId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
 	}
+
+
 
 	//todo: commentCount 수정
 
