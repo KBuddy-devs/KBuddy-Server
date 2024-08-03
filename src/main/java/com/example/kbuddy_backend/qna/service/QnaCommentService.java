@@ -21,7 +21,6 @@ public class QnaCommentService {
 
     private final QnaCommentRepository qnaCommentRepository;
     private final QnaHeartRepository qnaHeartRepository;
-
     private final QnaService qnaService;
 
     @Transactional

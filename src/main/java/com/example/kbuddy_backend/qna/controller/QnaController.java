@@ -5,6 +5,7 @@ import com.amazonaws.Response;
 import com.example.kbuddy_backend.common.config.CurrentUser;
 import com.example.kbuddy_backend.qna.dto.request.QnaCommentSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
+import com.example.kbuddy_backend.qna.dto.request.QnaUpdateRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.service.QnaCommentService;
 import com.example.kbuddy_backend.qna.service.QnaService;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,6 +45,24 @@ public class QnaController {
         return ResponseEntity.ok().body(qna);
     }
 
+    @PatchMapping("/{qnaId}")
+    public ResponseEntity<QnaResponse> updateQna(@PathVariable Long qnaId, @RequestBody QnaUpdateRequest qnaUpdateRequest, @CurrentUser User user) {
+        QnaResponse qna = qnaService.updateQna(qnaId, qnaUpdateRequest, user);
+        return ResponseEntity.ok().body(qna);
+    }
+
+    @PostMapping("/{qnaId}/images")
+    public ResponseEntity<String> addQnaImages(@PathVariable Long qnaId, @RequestPart List<MultipartFile> images, @CurrentUser User user) {
+        qnaService.addImages(qnaId, images, user);
+        return ResponseEntity.ok().body("이미지가 성공적으로 추가되었습니다.");
+    }
+
+    @DeleteMapping("/{qnaId}/images")
+    public ResponseEntity<String> deleteQnaImages(@PathVariable Long qnaId, @RequestPart List<String> imageUrls, @CurrentUser User user) {
+        qnaService.deleteImages(qnaId, imageUrls, user);
+        return ResponseEntity.ok().body("이미지가 성공적으로 삭제되었습니다.");
+    }
+
     @DeleteMapping("/{qnaId}")
     public ResponseEntity<String> deleteQna(@PathVariable Long qnaId, @CurrentUser User user) {
         qnaService.deleteQna(qnaId, user);
@@ -50,7 +70,7 @@ public class QnaController {
 
     }
 
-    @PostMapping("/{qnaId}/comment")
+    @PostMapping("/{qnaId}/comments")
     public ResponseEntity<?> saveQnaComment(@PathVariable Long qnaId,@RequestBody QnaCommentSaveRequest qnaCommentSaveRequest,
                                             @CurrentUser User user) {
         qnaCommentService.saveQnaComment(qnaId,qnaCommentSaveRequest, user);
@@ -72,14 +92,14 @@ public class QnaController {
     }
 
     //댓글 좋아요
-    @PostMapping("/comment/{commentId}/hearts")
+    @PostMapping("/comments/{commentId}/hearts")
     public ResponseEntity<?> plusCommentHeart(@PathVariable Long commentId, @CurrentUser User user) {
         qnaCommentService.plusHeart(commentId, user);
         return ResponseEntity.ok().body("success");
     }
 
     //댓글 좋아요 취소
-    @DeleteMapping("/comment/{commentId}/hearts")
+    @DeleteMapping("/comments/{commentId}/hearts")
     public ResponseEntity<?> minusCommentHeart(@PathVariable Long commentId, @CurrentUser User user) {
         qnaCommentService.minusHeart(commentId, user);
         return ResponseEntity.ok().body("success");

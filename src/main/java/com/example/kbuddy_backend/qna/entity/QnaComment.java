@@ -1,6 +1,7 @@
 package com.example.kbuddy_backend.qna.entity;
 
 import com.example.kbuddy_backend.common.entity.BaseTimeEntity;
+import com.example.kbuddy_backend.qna.dto.response.QnaCommentResponse;
 import com.example.kbuddy_backend.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -70,6 +71,7 @@ public class QnaComment extends BaseTimeEntity {
         this.qna = qna;
         qna.addComment(this);
     }
+
 
 
 }

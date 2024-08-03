@@ -48,6 +48,7 @@ public class Qna extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private QnaCategory category;
+
     private String title;
     private String description;
 
@@ -62,6 +63,13 @@ public class Qna extends BaseTimeEntity {
         this.hashtag = hashtag;
         this.category = category;
         this.description = description;
+    }
+
+    public void update(String title, String description, String hashtag, QnaCategory category) {
+        this.title = title;
+        this.description = description;
+        this.hashtag = hashtag;
+        this.category = category;
     }
 
     public void addImage(QnaImage qnaImage) {
@@ -96,6 +104,7 @@ public class Qna extends BaseTimeEntity {
     public void delete() {
         super.setDelYn(true);
     }
+
 
 
 }
