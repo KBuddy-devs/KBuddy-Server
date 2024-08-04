@@ -2,11 +2,16 @@ package com.example.kbuddy_backend.user.controller;
 
 import com.example.kbuddy_backend.common.config.CurrentUser;
 import com.example.kbuddy_backend.user.dto.request.UserBioRequest;
+import com.example.kbuddy_backend.user.dto.response.AllUserResponse;
 import com.example.kbuddy_backend.user.dto.response.DefaultResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +31,12 @@ public class UserPageController {
 
         UserResponse findUser = userService.getUser(user);
         return ResponseEntity.ok().body(findUser);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<AllUserResponse> getAllUsers(@PageableDefault(size = 5,sort = "createdDate",direction = Sort.Direction.DESC) Pageable pageable) {
+        AllUserResponse allUsers = userService.getAllUsers(pageable);
+        return ResponseEntity.ok().body(allUsers);
     }
 
     @PostMapping("/bio")
