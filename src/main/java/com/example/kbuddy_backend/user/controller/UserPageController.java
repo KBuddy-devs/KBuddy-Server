@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +39,12 @@ public class UserPageController {
     public ResponseEntity<AllUserResponse> getAllUsers(@PageableDefault(size = 5,sort = "createdDate",direction = Sort.Direction.DESC) Pageable pageable) {
         AllUserResponse allUsers = userService.getAllUsers(pageable);
         return ResponseEntity.ok().body(allUsers);
+    }
+
+    @PostMapping("/profile/images")
+    public ResponseEntity<String> uploadProfileImage(@RequestPart MultipartFile image, @CurrentUser User user) {
+        userService.uploadProfileImage(image, user);
+        return ResponseEntity.ok().body("프로필 사진이 성공적으로 저장되었습니다.");
     }
 
     @PostMapping("/bio")

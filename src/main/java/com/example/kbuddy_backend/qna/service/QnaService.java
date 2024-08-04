@@ -44,7 +44,6 @@ public class QnaService {
 	private final QnaCategoryRepository qnaCategoryRepository;
 	private final S3Service s3Service;
 	private static final String FOLDER_NAME = "qna";
-	private final QnaImageRepository qnaImageRepository;
 
 	@Transactional
 	public QnaResponse saveQna(QnaSaveRequest qnaSaveRequest, List<MultipartFile> imageFiles, User user) {

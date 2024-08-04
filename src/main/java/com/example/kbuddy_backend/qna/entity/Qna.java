@@ -84,6 +84,7 @@ public class Qna extends BaseTimeEntity {
 			.filter(image -> image.getFilePath().equals(filePath))
 			.findFirst()
 			.orElseThrow(() -> new IllegalArgumentException("해당 이미지가 없습니다."));
+		qnaImage.setQna(null);
 		imageUrls.remove(qnaImage);
 	}
 
