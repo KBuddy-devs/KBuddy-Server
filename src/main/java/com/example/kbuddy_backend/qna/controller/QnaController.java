@@ -5,6 +5,7 @@ import com.example.kbuddy_backend.qna.dto.request.QnaCommentSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaImageRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaUpdateRequest;
+import com.example.kbuddy_backend.qna.dto.response.AllQnaResponse;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.service.QnaCommentService;
 import com.example.kbuddy_backend.qna.service.QnaService;
@@ -14,6 +15,9 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +44,13 @@ public class QnaController {
 		@RequestPart(value = "request") QnaSaveRequest qnaSaveRequest, @CurrentUser User user) {
 		QnaResponse qnaResponse = qnaService.saveQna(qnaSaveRequest, images, user);
 		return ResponseEntity.ok().body(qnaResponse);
+	}
+
+	//전체 조회 (페이징)
+	@GetMapping
+	public ResponseEntity<AllQnaResponse> getAllQna(@PageableDefault(size = 5,sort = "createdDate",direction = Sort.Direction.DESC) Pageable pageable) {
+		AllQnaResponse allQnaResponse = qnaService.getAllQna(pageable);
+		return ResponseEntity.ok().body(allQnaResponse);
 	}
 
 	@GetMapping("/{qnaId}")

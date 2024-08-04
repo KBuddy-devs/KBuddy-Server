@@ -23,7 +23,7 @@ public class UserService {
         List<String> authorities = findUser.getAuthorities().stream()
                 .map(authority -> authority.getAuthorityName().name())
                 .toList();
-        return UserResponse.of(findUser.getId(), findUser.getUsername(), findUser.getEmail(), authorities,
+        return UserResponse.of(findUser.getUuid().toString(), findUser.getUsername(), findUser.getEmail(), authorities,
                 findUser.getProfileImageUrl(), findUser.getBio(), findUser.getFirstName(), findUser.getLastName(),
                 findUser.getCreatedDate(), findUser.getGender(), findUser.getCountry(),findUser.isActive());
     }

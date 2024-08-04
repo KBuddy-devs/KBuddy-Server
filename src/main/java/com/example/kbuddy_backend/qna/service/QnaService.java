@@ -3,6 +3,7 @@ package com.example.kbuddy_backend.qna.service;
 import com.example.kbuddy_backend.qna.dto.request.QnaImageRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaUpdateRequest;
+import com.example.kbuddy_backend.qna.dto.response.AllQnaResponse;
 import com.example.kbuddy_backend.qna.dto.response.QnaCommentResponse;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
 import com.example.kbuddy_backend.qna.entity.Qna;
@@ -27,6 +28,8 @@ import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,6 +66,15 @@ public class QnaService {
 		}
 		Qna saveQna = qnaRepository.save(qna);
 		return createQnaResponseDto(saveQna);
+	}
+
+	public AllQnaResponse getAllQna(Pageable pageable) {
+		Page<Qna> allQna = qnaRepository.findAll(pageable);
+		List<QnaResponse> qnaResponses = allQna.stream()
+			.map(this::createQnaResponseDto)
+			.toList();
+
+		return AllQnaResponse.of(allQna.getTotalElements(), allQna.getTotalPages(), allQna.getNumber(), qnaResponses);
 	}
 
 	@Transactional
@@ -187,6 +199,8 @@ public class QnaService {
 		return qnaCategoryRepository.findById(categoryId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
 	}
+
+
 
 	//todo: commentCount 수정
 

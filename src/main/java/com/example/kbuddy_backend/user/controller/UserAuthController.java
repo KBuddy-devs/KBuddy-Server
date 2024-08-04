@@ -11,6 +11,7 @@ import com.example.kbuddy_backend.user.dto.request.OAuthLoginRequest;
 import com.example.kbuddy_backend.user.dto.request.OAuthRegisterRequest;
 import com.example.kbuddy_backend.user.dto.request.PasswordRequest;
 import com.example.kbuddy_backend.user.dto.request.RegisterRequest;
+import com.example.kbuddy_backend.user.dto.request.UsernameRequest;
 import com.example.kbuddy_backend.user.dto.response.DefaultResponse;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.repository.UserRepository;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserAuthController {
 
     private final UserAuthService userAuthService;
-    private final UserService userService;
     private final MailSendService mailService;
     private final UserRepository userRepository;
 
@@ -94,6 +94,15 @@ public class UserAuthController {
         userAuthService.resetPassword(passwordRequest, user);
         return ResponseEntity.ok().body("비밀번호 변경 성공");
 
+    }
+
+    @PostMapping("/nickname/check")
+    public ResponseEntity<DefaultResponse> checkNickname(@Valid @RequestBody final UsernameRequest request) {
+
+        if (userRepository.findByUsername(request.username()).isPresent()) {
+            return ResponseEntity.ok().body(DefaultResponse.of(false, "닉네임이 존재합니다."));
+        }
+        return ResponseEntity.ok().body(DefaultResponse.of(true, "사용가능한 닉네임입니다."));
     }
 
     //토큰 불필요

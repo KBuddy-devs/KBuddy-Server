@@ -43,7 +43,7 @@ public class UserAuthService {
         final String email = registerRequest.email();
         final String username = registerRequest.userId();
 
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmailOrUsername(email,username);
 
         if (user.isPresent()) {
             throw new DuplicateUserException();
@@ -79,7 +79,7 @@ public class UserAuthService {
         final String email = registerRequest.email();
         final String username = registerRequest.userId();
 
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmailOrUsername(email,username);
 
         if (user.isPresent()) {
             throw new DuplicateUserException();
