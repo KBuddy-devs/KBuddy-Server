@@ -1,11 +1,15 @@
 package com.example.kbuddy_backend.auth.service;
 
 import com.example.kbuddy_backend.common.util.RedisUtil;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+
 import java.util.Random;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -24,7 +28,7 @@ public class MailSendService {
         Random r = new Random();
         StringBuilder randomNumber = new StringBuilder();
         for (int i = 0; i < 6; i++) {
-            randomNumber.append(Integer.toString(r.nextInt(10)));
+            randomNumber.append(r.nextInt(10));
         }
 
         authNumber = Integer.parseInt(randomNumber.toString());
@@ -40,7 +44,7 @@ public class MailSendService {
     //mail을 어디서 보내는지, 어디로 보내는지 , 인증 번호를 html 형식으로 어떻게 보내는지 작성.
     public String joinEmail(String email) {
         makeRandomNumber();
-        String setFrom = "tripcompany77@gmail.com";
+        String setFrom = "officialkbuddy@gmail.com";
         String title = "AUTH CODE for K-Buddy Registration"; // 이메일 제목
         String content =
                 "Welcome to K-Buddy" +    //html 형식으로 작성 !

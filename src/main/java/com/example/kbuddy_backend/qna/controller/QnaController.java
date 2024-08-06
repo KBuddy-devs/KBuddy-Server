@@ -1,6 +1,7 @@
 package com.example.kbuddy_backend.qna.controller;
 
 import com.example.kbuddy_backend.common.config.CurrentUser;
+import com.example.kbuddy_backend.qna.constant.SortBy;
 import com.example.kbuddy_backend.qna.dto.request.QnaCommentSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaImageRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,8 +50,9 @@ public class QnaController {
 
 	//전체 조회 (페이징)
 	@GetMapping
-	public ResponseEntity<AllQnaResponse> getAllQna(@PageableDefault(size = 5,sort = "createdDate",direction = Sort.Direction.DESC) Pageable pageable) {
-		AllQnaResponse allQnaResponse = qnaService.getAllQna(pageable);
+	public ResponseEntity<AllQnaResponse> getAllQna(@RequestParam(value = "size") int pageSize, @RequestParam(value = "id",required = false) Long qnaId, @RequestParam(value = "keyword") String title, @RequestParam(required = false,value = "sort")
+													SortBy sortBy) {
+		AllQnaResponse allQnaResponse = qnaService.getAllQna(pageSize, qnaId, title, sortBy);
 		return ResponseEntity.ok().body(allQnaResponse);
 	}
 
