@@ -1,12 +1,10 @@
 package com.example.kbuddy_backend.user.service;
 
-import com.example.kbuddy_backend.qna.entity.QnaImage;
 import com.example.kbuddy_backend.s3.dto.response.S3Response;
 import com.example.kbuddy_backend.s3.exception.ImageUploadException;
 import com.example.kbuddy_backend.s3.service.S3Service;
 import com.example.kbuddy_backend.user.dto.request.UserBioRequest;
 import com.example.kbuddy_backend.user.dto.response.AllUserResponse;
-import com.example.kbuddy_backend.user.dto.response.UserAuthorityResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.entity.UserImage;

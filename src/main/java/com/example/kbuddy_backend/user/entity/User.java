@@ -84,7 +84,6 @@ public class User extends BaseTimeEntity {
 	}
 
 	public void setImageUrls(UserImage image) {
-
 		this.imageUrls = image;
 		image.setUser(this);
 

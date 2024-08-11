@@ -3,7 +3,6 @@ package com.example.kbuddy_backend.user.controller;
 import com.example.kbuddy_backend.common.config.CurrentUser;
 import com.example.kbuddy_backend.user.dto.request.UserBioRequest;
 import com.example.kbuddy_backend.user.dto.response.AllUserResponse;
-import com.example.kbuddy_backend.user.dto.response.DefaultResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.service.UserService;

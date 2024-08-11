@@ -124,4 +124,8 @@ public class QnaController {
 		qnaCommentService.minusHeart(commentId, user);
 		return ResponseEntity.ok().body("success");
 	}
+	
+	//단일 QnA 컨텐츠 북마크
+	// @PostMapping("/{qnaId}/bookmark")
+	// public ResponseEntity<String>
 }
