@@ -38,4 +38,8 @@ public class QnaCollection {
 	@OneToMany(mappedBy = "qnaCollection",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<QnaBookmark> qnaBookmark = new ArrayList<>();
 
+	public void addBookmark(QnaBookmark qnaBookmark) {
+		this.qnaBookmark.add(qnaBookmark);
+	}
+
 }
