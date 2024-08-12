@@ -7,10 +7,8 @@ import com.example.kbuddy_backend.qna.dto.request.QnaImageRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaUpdateRequest;
 import com.example.kbuddy_backend.qna.dto.response.AllQnaResponse;
-import com.example.kbuddy_backend.qna.dto.response.BookmarkRequest;
+import com.example.kbuddy_backend.qna.dto.request.BookmarkRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
-import com.example.kbuddy_backend.qna.repository.QnaBookmarkRepository;
-import com.example.kbuddy_backend.qna.repository.QnaCollectionRepository;
 import com.example.kbuddy_backend.qna.service.QnaCommentService;
 import com.example.kbuddy_backend.qna.service.QnaService;
 import com.example.kbuddy_backend.user.entity.User;
@@ -19,9 +17,6 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("kbuddy/v1/qna")
 public class QnaController {
 
-	private final QnaService qnaService;
-	private final QnaCommentService qnaCommentService;
+    private final QnaService qnaService;
+    private final QnaCommentService qnaCommentService;
 
 
 	//todo: 응답 dto 추가
@@ -115,19 +110,6 @@ public class QnaController {
 		return ResponseEntity.ok().body("success");
 	}
 
-	//댓글 좋아요
-	@PostMapping("/comments/{commentId}/hearts")
-	public ResponseEntity<?> plusCommentHeart(@PathVariable final Long commentId, @CurrentUser User user) {
-		qnaCommentService.plusHeart(commentId, user);
-		return ResponseEntity.ok().body("success");
-	}
-
-	//댓글 좋아요 취소
-	@DeleteMapping("/comments/{commentId}/hearts")
-	public ResponseEntity<?> minusCommentHeart(@PathVariable final Long commentId, @CurrentUser User user) {
-		qnaCommentService.minusHeart(commentId, user);
-		return ResponseEntity.ok().body("success");
-	}
 
 	//단일 QnA 컨텐츠 북마크
 	@PostMapping("/{qnaId}/bookmark")
@@ -135,4 +117,5 @@ public class QnaController {
 		qnaService.addBookmark(bookmarkRequest, qnaId);
 		return ResponseEntity.ok().body("성공적으로 북마크 하였습니다.");
 	}
+
 }

@@ -1,6 +1,7 @@
 package com.example.kbuddy_backend.user.controller;
 
 import com.example.kbuddy_backend.common.config.CurrentUser;
+import com.example.kbuddy_backend.user.dto.request.CollectionRequest;
 import com.example.kbuddy_backend.user.dto.request.UserBioRequest;
 import com.example.kbuddy_backend.user.dto.response.AllUserResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
@@ -50,5 +51,14 @@ public class UserPageController {
     public ResponseEntity<String> saveUserBio(@RequestBody UserBioRequest request, @CurrentUser User user) {
         userService.saveUserBio(request, user);
         return ResponseEntity.ok().body("성공적으로 저장되었습니다.");
+    }
+
+    //단일 유저 컬렉션 생성
+    @PostMapping("/collection")
+    public ResponseEntity<String> saveUserCollection(@RequestBody CollectionRequest collectionRequest,
+                                                     @CurrentUser User user) {
+        userService.saveCollection(collectionRequest, user);
+        return ResponseEntity.ok().body("성공적으로 저장되었습니다.");
+
     }
 }

@@ -20,7 +20,6 @@ public class QnaCommentService {
 
 
     private final QnaCommentRepository qnaCommentRepository;
-    private final QnaHeartRepository qnaHeartRepository;
     private final QnaService qnaService;
 
     @Transactional
@@ -32,26 +31,6 @@ public class QnaCommentService {
                 .writer(user)
                 .build();
         qnaCommentRepository.save(qnaComment);
-    }
-
-    @Transactional
-    public void plusHeart(Long commentId, User user) {
-        qnaHeartRepository.findByQnaCommentIdAndUserId(commentId, user.getId())
-                .ifPresent(qnaHeart -> {
-                    throw new DuplicatedQnaCommentHeartException();
-                });
-        QnaComment qnaComment = findQnaCommentById(commentId);
-        QnaHeart qnaHeart = new QnaHeart(user, qnaComment);
-        qnaComment.plusHeart(qnaHeart);
-        qnaHeartRepository.save(qnaHeart);
-    }
-
-    @Transactional
-    public void minusHeart(Long commentId, User user) {
-        QnaComment qnaComment = findQnaCommentById(commentId);
-        QnaHeart byQnaIdAndUserId = qnaHeartRepository.findByQnaCommentIdAndUserId(commentId, user.getId()).orElseThrow(QnaCommentNotFoundException::new);
-        qnaComment.minusHeart(byQnaIdAndUserId);
-        qnaHeartRepository.deleteByQnaCommentIdAndUserId(commentId, user.getId());
     }
 
     private QnaComment findQnaCommentById(Long commentId) {

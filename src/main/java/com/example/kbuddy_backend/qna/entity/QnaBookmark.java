@@ -29,7 +29,13 @@ public class QnaBookmark {
 	@JoinColumn(name="qna_id")
 	private Qna qna;
 
-	public QnaBookmark(Qna qna) {
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "qna_collection_id")
+	private QnaCollection qnaCollection;
+
+
+	public QnaBookmark(Qna qna, QnaCollection qnaCollection) {
+		this.qnaCollection = qnaCollection;
 		this.qna = qna;
 	}
 }

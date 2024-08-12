@@ -1,14 +1,16 @@
 package com.example.kbuddy_backend.user.service;
 
+import com.example.kbuddy_backend.qna.entity.QnaCollection;
+import com.example.kbuddy_backend.qna.repository.QnaCollectionRepository;
 import com.example.kbuddy_backend.s3.dto.response.S3Response;
 import com.example.kbuddy_backend.s3.exception.ImageUploadException;
 import com.example.kbuddy_backend.s3.service.S3Service;
+import com.example.kbuddy_backend.user.dto.request.CollectionRequest;
 import com.example.kbuddy_backend.user.dto.request.UserBioRequest;
 import com.example.kbuddy_backend.user.dto.response.AllUserResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.User;
 import com.example.kbuddy_backend.user.entity.UserImage;
-import com.example.kbuddy_backend.user.repository.UserImageRepository;
 import com.example.kbuddy_backend.user.repository.UserRepository;
 
 import java.util.List;
@@ -28,8 +30,9 @@ public class UserService {
 
 	private final UserRepository userRepository;
 	private final S3Service s3Service;
+	private final QnaCollectionRepository qnaCollectionRepository;
 	private static final String FOLDER_NAME = "user";
-	private final UserImageRepository userImageRepository;
+
 
 	public UserResponse getUser(User user) {
 		User findUser = userRepository.findById(user.getId())
@@ -86,4 +89,10 @@ public class UserService {
 			findUser.getCreatedDate(), findUser.getGender(), findUser.getCountry(), findUser.isActive());
 	}
 
+	@Transactional
+	public void saveCollection(CollectionRequest collectionRequest, User user) {
+		final String collectionTitle = collectionRequest.collectionTitle();
+		QnaCollection qnaCollection = new QnaCollection(collectionTitle, user);
+		qnaCollectionRepository.save(qnaCollection);
+	}
 }

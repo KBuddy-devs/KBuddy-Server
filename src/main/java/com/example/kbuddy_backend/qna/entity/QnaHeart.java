@@ -33,18 +33,10 @@ public class QnaHeart extends BaseTimeEntity {
     @JoinColumn(name = "qna_id")
     private Qna qna;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "qna_comment_id")
-    private QnaComment qnaComment;
-
     public QnaHeart(User user, Qna qna) {
 
         this.user = user;
         this.qna = qna;
     }
 
-    public QnaHeart(User user, QnaComment qnaComment) {
-        this.user = user;
-        this.qnaComment = qnaComment;
-    }
 }

@@ -39,11 +39,6 @@ public class QnaComment extends BaseTimeEntity {
     @JoinColumn(name = "qna_id")
     private Qna qna;
 
-    @OneToMany(mappedBy = "qnaComment")
-    private List<QnaHeart> qnaHearts = new ArrayList<>();
-
-    private int heartCount;
-
     public void setQna(Qna qna) {
         this.qna = qna;
     }
@@ -55,17 +50,6 @@ public class QnaComment extends BaseTimeEntity {
         this.qna = qna;
     }
 
-    public void plusHeart(QnaHeart qnaHeart) {
-        this.heartCount += 1;
-        this.qnaHearts.add(qnaHeart);
-    }
-
-    public void minusHeart(QnaHeart qnaHeart) {
-        if (this.heartCount > 0) {
-            this.heartCount -= 1;
-        }
-        this.qnaHearts.remove(qnaHeart);
-    }
 
     public void addQna(Qna qna) {
         this.qna = qna;
