@@ -1,5 +1,6 @@
 package com.example.kbuddy_backend.qna.service;
 
+import com.example.kbuddy_backend.common.dto.ImageFileDto;
 import com.example.kbuddy_backend.qna.constant.SortBy;
 import com.example.kbuddy_backend.qna.dto.request.BookmarkRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaImageRequest;
@@ -18,13 +19,10 @@ import com.example.kbuddy_backend.qna.entity.QnaImage;
 import com.example.kbuddy_backend.qna.exception.DuplicatedQnaHeartException;
 import com.example.kbuddy_backend.qna.exception.NotWriterException;
 import com.example.kbuddy_backend.qna.exception.QnaNotFoundException;
-import com.example.kbuddy_backend.qna.repository.QnaBookmarkRepository;
 import com.example.kbuddy_backend.qna.repository.QnaCategoryRepository;
 import com.example.kbuddy_backend.qna.repository.QnaCollectionRepository;
 import com.example.kbuddy_backend.qna.repository.QnaHeartRepository;
 import com.example.kbuddy_backend.qna.repository.QnaRepository;
-import com.example.kbuddy_backend.s3.dto.response.S3Response;
-import com.example.kbuddy_backend.s3.exception.ImageUploadException;
 import com.example.kbuddy_backend.s3.service.S3Service;
 import com.example.kbuddy_backend.user.entity.User;
 import java.util.Comparator;
@@ -48,7 +46,9 @@ public class QnaService {
     private static final String FOLDER_NAME = "qna";
 
     @Transactional
-    public QnaResponse saveQna(QnaSaveRequest qnaSaveRequest, List<MultipartFile> imageFiles, User user) {
+    public QnaResponse saveQna(QnaSaveRequest qnaSaveRequest, User user) {
+
+        List<ImageFileDto> imageFiles = qnaSaveRequest.file();
 
         String hashtag = String.join(",", qnaSaveRequest.hashtags());
         QnaCategory qnaCategory = findCategoryById(qnaSaveRequest.categoryId());
@@ -62,9 +62,10 @@ public class QnaService {
                 .build();
 
         //todo: 트랜잭션 실패 시 이미지 삭제하는 로직 추가
-        if (imageFiles != null && !imageFiles.isEmpty()) {
+        if (imageFiles != null) {
             saveImageFiles(imageFiles, qna);
         }
+
         Qna saveQna = qnaRepository.save(qna);
         return createQnaResponseDto(saveQna);
     }
@@ -117,19 +118,18 @@ public class QnaService {
     }
 
     @Transactional
-    public void addImages(Long qnaId, List<MultipartFile> images, User user) {
+    public void addImages(Long qnaId, List<ImageFileDto> images, User user) {
         Qna qna = findQnaById(qnaId);
         isQnaWriter(user, qna);
         saveImageFiles(images, qna);
     }
 
     @Transactional
-    public void deleteImages(Long qnaId, QnaImageRequest images, User user) {
+    public void deleteImages(Long qnaId, List<ImageFileDto> images, User user) {
         Qna qna = findQnaById(qnaId);
         isQnaWriter(user, qna);
-        for (String image : images.images()) {
-            s3Service.deleteFile(image);
-            qna.deleteImage(image);
+        for (ImageFileDto image : images) {
+            qna.deleteImage(image.name());
         }
     }
 
@@ -143,9 +143,9 @@ public class QnaService {
     }
 
     private QnaResponse createQnaResponseDto(Qna qna) {
-        List<S3Response> images = qna.getImageUrls()
+        List<ImageFileDto> images = qna.getImageUrls()
                 .stream()
-                .map(qnaImage -> new S3Response(qnaImage.getOriginalFileName(), qnaImage.getFilePath(),
+                .map(qnaImage -> new ImageFileDto(qnaImage.getFileType(), qnaImage.getFilePath(),
                         qnaImage.getImageUrl()
                 ))
                 .toList();
@@ -164,21 +164,14 @@ public class QnaService {
                 images, comments, qna.getHeartCount(), qna.getCommentCount());
     }
 
-    private void saveImageFiles(List<MultipartFile> imageFiles, Qna qna) {
-
-        for (MultipartFile imageFile : imageFiles) {
-            if (!s3Service.checkImageFile(imageFile)) {
-                throw new ImageUploadException("이미지 파일이 아닙니다.");
-            }
-            S3Response s3Response = s3Service.saveFileWithUUID(imageFile, FOLDER_NAME);
-
+    private void saveImageFiles(List<ImageFileDto> imageFiles, Qna qna) {
+        for (ImageFileDto imageFile : imageFiles) {
             QnaImage qnaImage = QnaImage.builder()
                     .qna(qna)
-                    .imageUrl(s3Response.s3ImageUrl())
-                    .filePath(s3Response.filePath())
-                    .originalFileName(s3Response.originalFileName())
+                    .imageUrl(imageFile.url())
+                    .filePath(imageFile.name())
+                    .fileType(imageFile.type())
                     .build();
-
             qna.addImage(qnaImage);
         }
     }

@@ -1,8 +1,9 @@
 package com.example.kbuddy_backend.qna.entity;
 
-import com.example.kbuddy_backend.common.entity.BaseTimeEntity;
-
+import com.example.kbuddy_backend.common.constant.ImageFileType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,20 +32,17 @@ public class QnaImage {
 	private Qna qna;
 
 	private String imageUrl;
-	private String originalFileName;
+	@Enumerated(EnumType.STRING)
+	private ImageFileType fileType;
+
 	private String filePath;
 	private final LocalDateTime createdAt = LocalDateTime.now();
 
 	@Builder
-	public QnaImage(Qna qna, String imageUrl, String originalFileName, String filePath) {
-
+	public QnaImage(Qna qna, String imageUrl, ImageFileType fileType, String filePath) {
 		this.qna = qna;
 		this.imageUrl = imageUrl;
-		this.originalFileName = originalFileName;
+		this.fileType = fileType;
 		this.filePath = filePath;
-	}
-
-	public void setQna(Qna qna) {
-		this.qna = qna;
 	}
 }

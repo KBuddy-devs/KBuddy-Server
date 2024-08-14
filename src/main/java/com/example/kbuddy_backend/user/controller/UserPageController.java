@@ -2,7 +2,7 @@ package com.example.kbuddy_backend.user.controller;
 
 import com.example.kbuddy_backend.common.config.CurrentUser;
 import com.example.kbuddy_backend.user.dto.request.CollectionRequest;
-import com.example.kbuddy_backend.user.dto.request.UserBioRequest;
+import com.example.kbuddy_backend.user.dto.request.UserProfileUpdateRequest;
 import com.example.kbuddy_backend.user.dto.response.AllUserResponse;
 import com.example.kbuddy_backend.user.dto.response.UserResponse;
 import com.example.kbuddy_backend.user.entity.User;
@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,16 +42,11 @@ public class UserPageController {
         return ResponseEntity.ok().body(allUsers);
     }
 
-    @PostMapping("/profile/images")
-    public ResponseEntity<String> uploadProfileImage(@RequestPart MultipartFile image, @CurrentUser User user) {
-        userService.uploadProfileImage(image, user);
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<String> updateProfile(@RequestBody UserProfileUpdateRequest request, @PathVariable Long userId) {
+        userService.updateProfile(request, userId);
+        //todo: 유저 정보반환
         return ResponseEntity.ok().body("프로필 사진이 성공적으로 저장되었습니다.");
-    }
-
-    @PostMapping("/bio")
-    public ResponseEntity<String> saveUserBio(@RequestBody UserBioRequest request, @CurrentUser User user) {
-        userService.saveUserBio(request, user);
-        return ResponseEntity.ok().body("성공적으로 저장되었습니다.");
     }
 
     //단일 유저 컬렉션 생성
