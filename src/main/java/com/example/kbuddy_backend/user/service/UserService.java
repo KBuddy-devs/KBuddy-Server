@@ -1,10 +1,8 @@
 package com.example.kbuddy_backend.user.service;
 
+import com.example.kbuddy_backend.common.dto.ImageFileDto;
 import com.example.kbuddy_backend.qna.entity.QnaCollection;
 import com.example.kbuddy_backend.qna.repository.QnaCollectionRepository;
-import com.example.kbuddy_backend.s3.dto.response.S3Response;
-import com.example.kbuddy_backend.s3.exception.ImageUploadException;
-import com.example.kbuddy_backend.s3.service.S3Service;
 import com.example.kbuddy_backend.user.dto.request.CollectionRequest;
 import com.example.kbuddy_backend.user.dto.request.UserProfileUpdateRequest;
 import com.example.kbuddy_backend.user.dto.response.AllUserResponse;
@@ -18,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -67,7 +64,8 @@ public class UserService {
                 .map(authority -> authority.getAuthorityName().name())
                 .toList();
         return UserResponse.of(findUser.getUuid().toString(), findUser.getUsername(), findUser.getEmail(), authorities,
-                findUser.getImageUrls() == null ? null : findUser.getImageUrls().getImageUrl(),
+                findUser.getImageUrls() == null ? null : ImageFileDto.of(findUser.getImageUrls().getFileType(),
+                        findUser.getImageUrls().getFilePath(),findUser.getImageUrls().getImageUrl()),
                 findUser.getBio(), findUser.getFirstName(), findUser.getLastName(),
                 findUser.getCreatedDate(), findUser.getGender(), findUser.getCountry(), findUser.isActive());
     }

@@ -42,7 +42,8 @@ public class S3Service {
             saveImageWithUUID(multipartFile, metadata, filePath);
             //이미지 URL 전체공개
             amazonS3.setObjectAcl(bucketName, filePath, CannedAccessControlList.PublicRead);
-            return S3Response.of(originalFilename, filePath, amazonS3.getUrl(bucketName, filePath).toString());
+            return
+                    S3Response.of(originalFilename, filePath, amazonS3.getUrl(bucketName, filePath).toString());
         } catch (IOException e) {
             log.error("s3에 file 저장중 에러 발생", e);
             throw new ImageUploadException(e.getMessage());
