@@ -111,9 +111,4 @@ public class Qna extends BaseTimeEntity {
 	public int getCommentCount() {
 		return comments.size();
 	}
-
-	public void delete() {
-		super.setDelYn(true);
-	}
-
 }

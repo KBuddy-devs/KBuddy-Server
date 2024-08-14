@@ -22,6 +22,4 @@ public abstract class BaseTimeEntity {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @Setter
-    private boolean delYn;
 }

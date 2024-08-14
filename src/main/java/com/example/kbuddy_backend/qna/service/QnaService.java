@@ -1,11 +1,11 @@
 package com.example.kbuddy_backend.qna.service;
 
 import com.example.kbuddy_backend.qna.constant.SortBy;
+import com.example.kbuddy_backend.qna.dto.request.BookmarkRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaImageRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaUpdateRequest;
 import com.example.kbuddy_backend.qna.dto.response.AllQnaResponse;
-import com.example.kbuddy_backend.qna.dto.request.BookmarkRequest;
 import com.example.kbuddy_backend.qna.dto.response.QnaCommentResponse;
 import com.example.kbuddy_backend.qna.dto.response.QnaPaginationResponse;
 import com.example.kbuddy_backend.qna.dto.response.QnaResponse;
@@ -44,7 +44,6 @@ public class QnaService {
     private final QnaHeartRepository qnaHeartRepository;
     private final QnaCategoryRepository qnaCategoryRepository;
     private final QnaCollectionRepository qnaCollectionRepository;
-    private final QnaBookmarkRepository qnaBookmarkRepository;
     private final S3Service s3Service;
     private static final String FOLDER_NAME = "qna";
 
@@ -76,7 +75,7 @@ public class QnaService {
                 .map(qna -> QnaPaginationResponse.of(qna.getId(), qna.getWriter().getId(), qna.getCategory().getId(),
                         qna.getTitle(), qna.getDescription(), qna.getViewCount(), qna.getHeartCount(),
                         qna.getCommentCount(), qna.getCreatedDate(),
-                        qna.getLastModifiedDate(), qna.isDelYn()))
+                        qna.getLastModifiedDate()))
                 .toList();
 
         Long nextId = getNextId(qnaPaginationResponseList);
@@ -140,7 +139,7 @@ public class QnaService {
 
         //해당 게시글 작성자가 아닐 경우
         isQnaWriter(user, qna);
-        qna.delete();
+        qnaRepository.delete(qna);
     }
 
     private QnaResponse createQnaResponseDto(Qna qna) {
@@ -155,14 +154,14 @@ public class QnaService {
                 .map(qnaComment ->
                         QnaCommentResponse.of(qnaComment.getId(), qnaComment.getQna().getId(),
                                 qnaComment.getWriter().getId(),
-                                qnaComment.getContent(),qnaComment.getCreatedDate(),
-                                qnaComment.getLastModifiedDate(), qnaComment.isDelYn()))
+                                qnaComment.getContent(), qnaComment.getCreatedDate(),
+                                qnaComment.getLastModifiedDate()))
                 .sorted(Comparator.comparing(QnaCommentResponse::createdAt))
                 .toList();
 
         return QnaResponse.of(qna.getId(), qna.getWriter().getId(), qna.getCategory().getId(), qna.getTitle(),
                 qna.getDescription(), qna.getViewCount(), qna.getCreatedDate(), qna.getLastModifiedDate(),
-                qna.isDelYn(), images, comments, qna.getHeartCount(), qna.getCommentCount());
+                images, comments, qna.getHeartCount(), qna.getCommentCount());
     }
 
     private void saveImageFiles(List<MultipartFile> imageFiles, Qna qna) {
@@ -209,7 +208,7 @@ public class QnaService {
     @Transactional
     public void addBookmark(BookmarkRequest bookmarkRequest, Long qnaId) {
         QnaCollection collectionById = findCollectionById(bookmarkRequest);
-        QnaBookmark qnaBookmark = new QnaBookmark(findQnaById(qnaId),collectionById);
+        QnaBookmark qnaBookmark = new QnaBookmark(findQnaById(qnaId), collectionById);
         collectionById.addBookmark(qnaBookmark);
     }
 
