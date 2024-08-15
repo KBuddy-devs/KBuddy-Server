@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +58,8 @@ public class User extends BaseTimeEntity {
     private UserImage imageUrls;
 
     private boolean isActive = true;
+    private LocalDateTime deactivationDate;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Authority> authorities = new ArrayList<>();
@@ -81,6 +84,16 @@ public class User extends BaseTimeEntity {
         this.bio = bio;
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public void resign() {
+        this.isActive = false;
+        this.deactivationDate = LocalDateTime.now();
+    }
+
+    public void assign() {
+        this.isActive = true;
+        this.deactivationDate = null;
     }
 
     public void setImageUrls(UserImage image) {

@@ -34,8 +34,8 @@ public class UserPageController {
     @GetMapping
     public ResponseEntity<UserResponse> getUser(@CurrentUser User user) {
 
-        UserResponse findUser = userService.getUser(user);
-        return ResponseEntity.ok().body(findUser);
+        UserResponse userResponse = userService.getUser(user);
+        return ResponseEntity.ok().body(userResponse);
     }
 
     @GetMapping("/all")
@@ -45,18 +45,33 @@ public class UserPageController {
         return ResponseEntity.ok().body(allUsers);
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<String> updateProfile(@RequestBody UserProfileUpdateRequest request,
+    //단일 유저 정보 수정
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserResponse> updateProfile(@RequestBody UserProfileUpdateRequest request,
                                                 @PathVariable String userId) {
-        userService.updateProfile(request, userId);
-        //todo: 유저 정보반환
-        return ResponseEntity.ok().body("프로필 사진이 성공적으로 저장되었습니다.");
+        UserResponse userResponse = userService.updateProfile(request, userId);
+        return ResponseEntity.ok().body(userResponse);
+    }
+
+    //단일 유저 계정 비활성화
+    @PostMapping("/{userId}/resign")
+    public ResponseEntity<String> resign(@PathVariable String userId) {
+        userService.resign(userId);
+        return ResponseEntity.ok().body("계정 비활성화가 완료되었습니다. 30일 이내 활성화 신청을 하지 않으면 계정이 삭제됩니다.");
+    }
+
+    //단일 유저 계정 활성화
+    @PostMapping("/{userId}/assign")
+    public ResponseEntity<UserResponse> assign(@PathVariable String userId) {
+        UserResponse userResponse = userService.assign(userId);
+        return ResponseEntity.ok().body(userResponse);
     }
 
     //단일 유저 컬렉션 생성
     @PostMapping("/collection")
     public ResponseEntity<String> saveUserCollection(@RequestBody CollectionRequest collectionRequest,
                                                      @CurrentUser User user) {
+
         userService.saveCollection(collectionRequest, user);
         return ResponseEntity.ok().body("성공적으로 저장되었습니다.");
 

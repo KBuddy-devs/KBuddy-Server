@@ -37,25 +37,16 @@ public class UserService {
         return createUserDto(findUser);
     }
 
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
-    }
-
-    private User findUserByUUID(String uuid) {
-        UUID userUuid = UUID.fromString(uuid);
-        return userRepository.findByUuid(userUuid).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
-    }
 
     public AllUserResponse getAllUsers(Pageable pageable) {
         Page<User> allUsers = userRepository.findAll(pageable);
         return AllUserResponse.of(allUsers.getTotalElements(), allUsers.getTotalPages(), allUsers.getNumber(),
-                allUsers.stream().map(user -> createUserDto(user)).toList()
+                allUsers.stream().map(this::createUserDto).toList()
         );
     }
 
     @Transactional
-    public void updateProfile(UserProfileUpdateRequest request, String userId) {
+    public UserResponse updateProfile(UserProfileUpdateRequest request, String userId) {
 
         User userById = findUserByUUID(userId);
         userById.updateProfile(request.userId(), request.email(), request.country(), request.gender(), request.bio(),
@@ -69,18 +60,9 @@ public class UserService {
                     .build();
             userById.setImageUrls(userImage);
         }
+        return createUserDto(userById);
     }
 
-    private UserResponse createUserDto(User findUser) {
-        List<String> authorities = findUser.getAuthorities().stream()
-                .map(authority -> authority.getAuthorityName().name())
-                .toList();
-        return UserResponse.of(findUser.getUuid().toString(), findUser.getUsername(), findUser.getEmail(), authorities,
-                findUser.getImageUrls() == null ? null : ImageFileDto.of(findUser.getImageUrls().getFileType(),
-                        findUser.getImageUrls().getFilePath(), findUser.getImageUrls().getImageUrl()),
-                findUser.getBio(), findUser.getFirstName(), findUser.getLastName(),
-                findUser.getCreatedDate(), findUser.getGender(), findUser.getCountry(), findUser.isActive());
-    }
 
     @Transactional
     public void saveCollection(CollectionRequest collectionRequest, User user) {
@@ -116,5 +98,39 @@ public class UserService {
         if (!Objects.equals(collectionById.getUser().getUuid().toString(), userId)) {
             throw new NotCollectionWriterException();
         }
+    }
+
+    @Transactional
+    public void resign(String userId) {
+        User userByUUID = findUserByUUID(userId);
+        userByUUID.resign();
+    }
+
+    @Transactional
+    public UserResponse assign(String userId) {
+        User userByUUID = findUserByUUID(userId);
+        userByUUID.assign();
+        return createUserDto(userByUUID);
+    }
+
+    private UserResponse createUserDto(User findUser) {
+        List<String> authorities = findUser.getAuthorities().stream()
+                .map(authority -> authority.getAuthorityName().name())
+                .toList();
+        return UserResponse.of(findUser.getUuid().toString(), findUser.getUsername(), findUser.getEmail(), authorities,
+                findUser.getImageUrls() == null ? null : ImageFileDto.of(findUser.getImageUrls().getFileType(),
+                        findUser.getImageUrls().getFilePath(), findUser.getImageUrls().getImageUrl()),
+                findUser.getBio(), findUser.getFirstName(), findUser.getLastName(),
+                findUser.getCreatedDate(), findUser.getGender(), findUser.getCountry(), findUser.isActive());
+    }
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
+    }
+
+    private User findUserByUUID(String uuid) {
+        UUID userUuid = UUID.fromString(uuid);
+        return userRepository.findByUuid(userUuid).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다."));
     }
 }
