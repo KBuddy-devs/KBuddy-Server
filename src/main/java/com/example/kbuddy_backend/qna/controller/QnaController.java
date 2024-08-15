@@ -5,7 +5,6 @@ import com.example.kbuddy_backend.common.dto.ImageFileDto;
 import com.example.kbuddy_backend.qna.constant.SortBy;
 import com.example.kbuddy_backend.qna.dto.request.BookmarkRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaCommentSaveRequest;
-import com.example.kbuddy_backend.qna.dto.request.QnaImageRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaSaveRequest;
 import com.example.kbuddy_backend.qna.dto.request.QnaUpdateRequest;
 import com.example.kbuddy_backend.qna.dto.response.AllQnaResponse;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -78,7 +76,8 @@ public class QnaController {
     }
 
     @DeleteMapping("/{qnaId}/images")
-    public ResponseEntity<String> deleteQnaImages(@PathVariable final Long qnaId, @RequestBody List<ImageFileDto> images,
+    public ResponseEntity<String> deleteQnaImages(@PathVariable final Long qnaId,
+                                                  @RequestBody List<ImageFileDto> images,
                                                   @CurrentUser User user) {
         qnaService.deleteImages(qnaId, images, user);
         return ResponseEntity.ok().body("이미지가 성공적으로 삭제되었습니다.");
@@ -121,4 +120,11 @@ public class QnaController {
         return ResponseEntity.ok().body("성공적으로 북마크 하였습니다.");
     }
 
+    //단일 QnA 컨텐츠 북마크 해제
+    @PostMapping("/{qnaId}/unbookmark")
+    public ResponseEntity<String> removeBookmark(@RequestBody BookmarkRequest bookmarkRequest,
+                                                 @PathVariable final Long qnaId) {
+        qnaService.removeBookmark(bookmarkRequest, qnaId);
+        return ResponseEntity.ok().body("성공적으로 북마크 해제 하였습니다.");
+    }
 }

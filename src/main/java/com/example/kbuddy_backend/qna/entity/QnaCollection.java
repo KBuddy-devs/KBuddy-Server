@@ -40,6 +40,14 @@ public class QnaCollection {
         this.qnaBookmark.add(qnaBookmark);
     }
 
+    public void removeBookmark(QnaBookmark qnaBookmark) {
+        this.qnaBookmark.remove(qnaBookmark);
+    }
+
+    public void updateCollectionName(String collectionName) {
+        this.collectionName = collectionName;
+    }
+
     public QnaCollection(String collectionName, User user) {
         this.collectionName = collectionName;
         this.user = user;

@@ -19,6 +19,7 @@ import com.example.kbuddy_backend.qna.entity.QnaImage;
 import com.example.kbuddy_backend.qna.exception.DuplicatedQnaHeartException;
 import com.example.kbuddy_backend.qna.exception.NotWriterException;
 import com.example.kbuddy_backend.qna.exception.QnaNotFoundException;
+import com.example.kbuddy_backend.qna.repository.QnaBookmarkRepository;
 import com.example.kbuddy_backend.qna.repository.QnaCategoryRepository;
 import com.example.kbuddy_backend.qna.repository.QnaCollectionRepository;
 import com.example.kbuddy_backend.qna.repository.QnaHeartRepository;
@@ -28,6 +29,7 @@ import com.example.kbuddy_backend.user.entity.User;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +44,7 @@ public class QnaService {
     private final QnaHeartRepository qnaHeartRepository;
     private final QnaCategoryRepository qnaCategoryRepository;
     private final QnaCollectionRepository qnaCollectionRepository;
-    private final S3Service s3Service;
-    private static final String FOLDER_NAME = "qna";
+    private final QnaBookmarkRepository qnaBookmarkRepository;
 
     @Transactional
     public QnaResponse saveQna(QnaSaveRequest qnaSaveRequest, User user) {
@@ -200,9 +201,18 @@ public class QnaService {
 
     @Transactional
     public void addBookmark(BookmarkRequest bookmarkRequest, Long qnaId) {
-        QnaCollection collectionById = findCollectionById(bookmarkRequest);
+        QnaCollection collectionById = findCollectionById(bookmarkRequest.collectionId());
         QnaBookmark qnaBookmark = new QnaBookmark(findQnaById(qnaId), collectionById);
         collectionById.addBookmark(qnaBookmark);
+    }
+
+
+    @Transactional
+    public void removeBookmark(BookmarkRequest bookmarkRequest, Long qnaId) {
+        QnaCollection collectionById = findCollectionById(bookmarkRequest.collectionId());
+        QnaBookmark qnaBookmark = qnaBookmarkRepository.findByQna(findQnaById(qnaId))
+                .orElseThrow(() -> new IllegalArgumentException("북마크 된 QnA가 아닙니다."));
+        collectionById.removeBookmark(qnaBookmark);
     }
 
     public Qna findQnaById(Long qnaId) {
@@ -214,10 +224,11 @@ public class QnaService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
     }
 
-    private QnaCollection findCollectionById(BookmarkRequest bookmarkRequest) {
-        return qnaCollectionRepository.findById(bookmarkRequest.collectionId())
+    public QnaCollection findCollectionById(Long bookmarkId) {
+        return qnaCollectionRepository.findById(bookmarkId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컬렉션입니다."));
     }
+
 
     //todo: commentCount 수정
 
