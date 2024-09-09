@@ -40,7 +40,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            kbuddydev/k-buddy_server
+            ${{ secrets.DOCKER_REPOSITORY }}
           flavor: |
             latest=true
           tags: |
