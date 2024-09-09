@@ -40,7 +40,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            kbuddydev/k-buddy_server
+            ap-chuncheon-1.ocir.io/axrlv6zrch9a/kbuddy-server
           flavor: |
             latest=true
           tags: |
