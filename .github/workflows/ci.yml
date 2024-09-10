@@ -45,7 +45,7 @@ jobs:
         uses: oracle-actions/get-ocir-repository@v1.3.0
         id: get-ocir-repository
         with:
-          name: oraclelinux
+          name: kbuddy-server
           compartment: ${{ secrets.OCI_COMPARTMENT_OCID }}
 
       - name: Log into OCIR
